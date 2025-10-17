@@ -5,8 +5,8 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
-group = "no.nav"
-version = "0.0.1-SNAPSHOT"
+group = "no.nav.tsm"
+version = "0.0.1"
 description = "App for manuell behandling av tilbakedaterte sykmeldinger"
 
 java {
