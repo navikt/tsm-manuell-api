@@ -10,3 +10,14 @@ spring:
     banner-mode: 'off'
   profiles:
     active: default
+
+management:
+  endpoint:
+    health.probes.enabled: true
+    health.show-details: always
+  endpoints.web:
+    base-path: "/internal"
+    exposure.include: health, prometheus
+  health:
+    livenessstate.enabled: true
+    readinessState.enabled: true
