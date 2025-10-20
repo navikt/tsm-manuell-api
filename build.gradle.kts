@@ -1,16 +1,20 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 group = "no.nav.tsm"
 version = "0.0.1"
 description = "App for manuell behandling av tilbakedaterte sykmeldinger"
 
+val javaVersion = JvmTarget.JVM_21
+
 val ktfmtVersion = "0.44"
+val sykmeldingInputVersion = "13"
 
 plugins {
-	kotlin("jvm") version "1.9.25"
-	kotlin("plugin.spring") version "1.9.25"
+	kotlin("jvm") version "2.2.0"
+	kotlin("plugin.spring") version "2.2.0"
 	id("org.springframework.boot") version "3.5.6"
 	id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
@@ -35,7 +39,10 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("no.nav.tsm.sykmelding", "input", sykmeldingInputVersion)
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -44,6 +51,7 @@ dependencies {
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
+        jvmTarget.set(javaVersion)
 	}
 }
 
@@ -55,6 +63,12 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+        testLogging {
+            events("skipped", "failed")
+            showStackTraces = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+        systemProperty("spring.profiles.active", "test")
     }
 
     configure<SpotlessExtension> {

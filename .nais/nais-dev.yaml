@@ -34,6 +34,10 @@ spec:
     requests:
       cpu: 50m
       memory: 350Mi
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
   kafka:
     pool: nav-dev
   secureLogs:

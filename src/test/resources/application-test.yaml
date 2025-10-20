@@ -1,0 +1,18 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+  kafka:
+    bootstrap-servers: localhost:9999
+    security:
+      protocol: plaintext
+
+nais:
+  token_endpoint: "http://localhost:8084/nais/token"
+  cluster: "cluster-test-name"
+
+kafka:
+  topics:
+    sykmeldinger: "topic-test-sykmeldinger"
