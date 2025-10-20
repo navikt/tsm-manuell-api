@@ -1,0 +1,14 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
+    security:
+      protocol: plaintext
+
+nais:
+  cluster: "cluster-test-name"
+

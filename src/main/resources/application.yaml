@@ -10,6 +10,25 @@ spring:
     banner-mode: 'off'
   profiles:
     active: default
+  kafka:
+    bootstrap-servers: ${kafka.brokers}
+    security:
+      protocol: ssl
+    ssl:
+      trust-store-type: JKS
+      trust-store-location: file:${kafka.truststore.path}
+      trust-store-password: ${kafka.credstore.password}
+      key-store-type: PKCS12
+      key-store-location: file:${kafka.keystore.path}
+      key-store-password: ${kafka.credstore.password}
+
+kafka:
+  topics:
+    sykmeldinger: "tsm.sykmeldinger"
+
+nais:
+  token_endpoint: ${NAIS_TOKEN_ENDPOINT}
+  cluster: ${NAIS_CLUSTER_NAME}
 
 management:
   endpoint:
