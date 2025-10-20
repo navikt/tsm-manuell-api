@@ -1,16 +1,20 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.kotlin.dsl.withType
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+
+group = "no.nav.tsm"
+version = "0.0.1"
+description = "App for manuell behandling av tilbakedaterte sykmeldinger"
+
+val ktfmtVersion = "0.44"
 
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.5.6"
 	id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "7.2.1"
 }
-
-group = "no.nav.tsm"
-version = "0.0.1"
-description = "App for manuell behandling av tilbakedaterte sykmeldinger"
 
 java {
 	toolchain {
@@ -20,6 +24,9 @@ java {
 
 repositories {
 	mavenCentral()
+    maven {
+        url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
+    }
 }
 
 dependencies {
@@ -47,5 +54,12 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+    }
+
+    configure<SpotlessExtension> {
+        kotlin { ktfmt(ktfmtVersion).kotlinlangStyle() }
+        check {
+            dependsOn("spotlessApply")
+        }
     }
 }
