@@ -1,7 +1,7 @@
 package no.nav.tsm_manuell_api.oppgave.client
 
-import no.nav.tsm_manuell_api.oppgave.GosysOpprettOppgave
-import no.nav.tsm_manuell_api.oppgave.GosysOpprettOppgaveResponse
+import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgave
+import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
 import no.nav.tsm_manuell_api.security.TexasClient
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.beans.factory.annotation.Value
@@ -36,18 +36,18 @@ class GosysOppgaveClient(
                     .retrieve()
                     .body<GosysOpprettOppgaveResponse>()
 
-            //todo handle different cases before returning
-            Result.success(response)
-        } catch (rcre: RestClientResponseException ) {
-            logger.error("Feil ved opprettelse av gosys oppgave: ${rcre.responseBodyAsString}", rcre)
-            Result.failure(rcre)
+            if (response != null) {
+                Result.success(response)
+            } else {
+                Result.failure(IllegalStateException("Response body was null"))
+            }
+        } catch (e: RestClientResponseException) {
+            logger.error("Feil ved opprettelse av gosys oppgave: ${e.responseBodyAsString}", e)
+            Result.failure(e)
         }
-
     }
 
-    private fun getToken(): TexasClient.TokenResponse =
-        texasClient.requestToken("fss", "oppgave")
-    //TODO er dette rett verdier ?????
-
+    private fun getToken(): TexasClient.TokenResponse = texasClient.requestToken("fss", "oppgave")
+    // TODO er dette rett verdier ?????
 
 }

@@ -1,9 +1,11 @@
 package no.nav.tsm_manuell_api.oppgave.repository
 
-import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveKomplett
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveKomplett
+import no.nav.tsm_manuell_api.oppgave.model.UlosteOppgave
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Repository
 @Transactional
@@ -11,23 +13,30 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     fun opprettManuellOppgave(sykmeldingId: String) {
         TODO("IMPLEMENT")
     }
+
     fun hentManuellOppgaveForSykmeldingId(sykmeldingId: String): ManuellOppgaveKomplett? {
         TODO("IMPLEMENT")
     }
+
     fun erManuellOppgaveOpprettet(sykmeldingId: String): Boolean {
         TODO("IMPLEMENT")
     }
+
     fun oppdaterManuellOppgave(sykmeldingId: String, status: String) {
         TODO("IMPLEMENT")
     }
 
-    fun oppdaterManuellOppgaveUtenOpprinneligValidationResult(sykmeldingId: String, status: String) {
+    fun oppdaterManuellOppgaveUtenOpprinneligValidationResult(
+        sykmeldingId: String,
+        status: String
+    ) {
         TODO("IMPLEMENT")
     }
 
     fun slettOppgave(sykmeldingId: String) {
         TODO("IMPLEMENT")
     }
+
     fun oppdaterOppgaveHendelse(oppgaveId: String, hendelse: String) {
         TODO("IMPLEMENT")
     }
@@ -35,6 +44,7 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     fun finnesOppgave(sykmeldingId: String): Boolean {
         TODO("IMPLEMENT")
     }
+
     fun finnesSykmelding(sykmeldingId: String): Boolean {
         TODO("IMPLEMENT")
     }
@@ -42,9 +52,11 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     fun hentManuellOppgave(oppgaveId: String): ManuellOppgaveDTO? {
         TODO("IMPLEMENT")
     }
+
     fun hentKompletteManuellOppgave(oppgaveId: String) {
         TODO("IMPLEMENT")
     }
+
     fun hentUlosteOppgaver(): List<UlosteOppgave> {
         TODO("IMPLEMENT")
     }
