@@ -2,7 +2,7 @@ package no.nav.tsm_manuell_api.oppgave
 
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 
-data class ManuellOppgave (
+data class ManuellOppgave(
     val sykmeldingRecord: SykmeldingRecord,
 )
 
