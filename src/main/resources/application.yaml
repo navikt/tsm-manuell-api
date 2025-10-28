@@ -51,3 +51,8 @@ management:
   health:
     livenessstate.enabled: true
     readinessState.enabled: true
+
+services:
+  gosys:
+    oppgave:
+      url: ${GOSYS_OPPGAVE_URL}
