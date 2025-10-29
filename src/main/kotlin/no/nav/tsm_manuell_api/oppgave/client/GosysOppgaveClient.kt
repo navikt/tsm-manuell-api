@@ -5,22 +5,30 @@ import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
 import no.nav.tsm_manuell_api.security.TexasClient
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.body
 
+interface IGosysOppgaveClient {
+    fun opprettOppgave(opprettOppgave: GosysOpprettOppgave): Result<GosysOpprettOppgaveResponse>
+}
+
+@Profile("!local & !test")
 @Component
 class GosysOppgaveClient(
     restClientBuilder: RestClient.Builder,
     private val texasClient: TexasClient,
     @param:Value($$"${services.gosys.oppgave.url}") private val gosysOppgaveEndpointUrl: String,
-) {
+) : IGosysOppgaveClient {
     val logger = logger()
     private val restClient = restClientBuilder.baseUrl(gosysOppgaveEndpointUrl).build()
 
-    fun opprettOppgave(opprettOppgave: GosysOpprettOppgave): Result<GosysOpprettOppgaveResponse> {
+    override fun opprettOppgave(
+        opprettOppgave: GosysOpprettOppgave
+    ): Result<GosysOpprettOppgaveResponse> {
         val (accessToken) = getToken()
 
         return try {
