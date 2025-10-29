@@ -4,6 +4,24 @@ metadata:
   name: tsm-manuell-api
   namespace: tsm
 spec:
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_17
+        name: tsm-manuell-api-instance
+        cascadingDelete: false
+        databases:
+          - name: tsm-manuell-api
+            envVarPrefix: DB
+        diskAutoresize: true
+        highAvailability: false
+        diskType: SSD
+        insights:
+          enabled: true
+        flags:
+          - name: cloudsql.logical_decoding
+            value: "on"
+        pointInTimeRecovery: true
+        tier: db-f1-micro
   image: {{ image }}
   replicas:
     min: 1
@@ -34,7 +52,14 @@ spec:
     requests:
       cpu: 50m
       memory: 350Mi
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
   kafka:
     pool: nav-dev
   secureLogs:
     enabled: true
+  env:
+    - name: GOSYS_OPPGAVE_URL
+      value: https://oppgave-q1.dev-fss-pub.nais.io/api/v1/oppgaver

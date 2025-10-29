@@ -10,6 +10,43 @@ spring:
     banner-mode: 'off'
   profiles:
     active: default
+  datasource:
+    url: "${DB_JDBC_URL}"
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 5
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZURE_OPENID_CONFIG_ISSUER}
+          jwk-set-uri: ${AZURE_OPENID_CONFIG_JWKS_URI}
+          audiences: ${AZURE_APP_CLIENT_ID}
+      client:
+        provider:
+          aad:
+            issuer-uri: ${azure.openid.config.issuer}
+  kafka:
+    bootstrap-servers: ${kafka.brokers}
+    security:
+      protocol: ssl
+    ssl:
+      trust-store-type: JKS
+      trust-store-location: file:${kafka.truststore.path}
+      trust-store-password: ${kafka.credstore.password}
+      key-store-type: PKCS12
+      key-store-location: file:${kafka.keystore.path}
+      key-store-password: ${kafka.credstore.password}
+
+kafka:
+  topics:
+    sykmeldinger: "tsm.sykmeldinger"
+
+nais:
+  token_endpoint: ${NAIS_TOKEN_ENDPOINT}
+  cluster: ${NAIS_CLUSTER_NAME}
 
 management:
   endpoint:
@@ -21,3 +58,8 @@ management:
   health:
     livenessstate.enabled: true
     readinessState.enabled: true
+
+services:
+  gosys:
+    oppgave:
+      url: ${GOSYS_OPPGAVE_URL}
