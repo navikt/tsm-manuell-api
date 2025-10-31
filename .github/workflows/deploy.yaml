@@ -35,6 +35,23 @@ jobs:
     outputs:
       image: "${{ steps.docker-build-push.outputs.image }}"
 
+  deploy-prod:
+    if: github.actor != 'dependabot[bot]' && github.ref_name == 'main'
+    name: Deploy to prod
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    needs: [build-push]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Deploy to NAIS
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/nais-prod.yaml
+          VAR: image=${{ needs.build-push.outputs.image }}
+
   deploy-dev:
     if: github.actor != 'dependabot[bot]'
     name: Deploy to dev
