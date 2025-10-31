@@ -1,9 +1,14 @@
 package no.nav.tsm_manuell_api.oppgave.model
 
-import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
+import java.time.LocalDateTime
+import no.nav.tsm.sykmelding.input.core.model.Sykmelding
 
 data class ManuellOppgave(
-    val sykmeldingRecord: SykmeldingRecord,
+    val sykmelding: Sykmelding,
+    val ferdigstilt: Boolean = false,
+    val oppgaveId: Int? = null,
+    val status: ManuellOppgaveStatus? = null,
+    val statusTimestamp: LocalDateTime,
 )
 
 enum class ManuellOppgaveStatus {
