@@ -18,13 +18,11 @@ class MottattSykmeldingService(
 ) {
     val logger = logger()
 
-    suspend fun handleMottattSykmelding(
+    fun handleMottattSykmelding(
         sykmeldingId: String,
-        sykmeldingRecordValue: String?,
+        sykmeldingRecordValue: ByteArray?,
         metadata: Map<String, ByteArray>
     ) {
-        // TODO her må vi vel sjekke om det er noko vi skal ta med vidare eller ikkje... er den
-        // pending etc - det som var den gamle merknaden
         if (sykmeldingRecordValue == null) {
             logger.info("Mottatt tombstone for sykmelding med id $sykmeldingId")
             manuellOppgaveService.slettOppgave(sykmeldingId)

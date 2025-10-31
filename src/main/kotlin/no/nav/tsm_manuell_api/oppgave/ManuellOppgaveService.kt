@@ -11,7 +11,7 @@ class ManuellOppgaveService(
 ) {
     val logger = logger()
 
-    suspend fun slettOppgave(sykmeldingId: String) {
+    fun slettOppgave(sykmeldingId: String) {
         val manuellOppgave = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
 
         manuellOppgave?.let {
