@@ -1,5 +1,6 @@
 package no.nav.tsm_manuell_api.oppgave
 
+import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
@@ -7,7 +8,6 @@ import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class ManuellOppgaveService(
@@ -29,14 +29,16 @@ class ManuellOppgaveService(
         val manuellOppgave = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
 
         manuellOppgave?.let {
-            if (!it.ferdigstilt) {
-                oppgaveService.ferdigstillOppgave(
-                    manuellOppgave = it,
-                    enhet = null,
-                    veileder = null,
-                )
-            }
-            val antallSlettedeOppgaver = oppgaveRepository.slettOppgave(it.oppgaveid)
+            // TODO: ferdigstillOppgave is not yet implemented for ManuellOppgaveDTO
+            // if (!it.ferdigstilt) {
+            //     oppgaveService.ferdigstillOppgave(
+            //         manuellOppgave = it,
+            //         enhet = null,
+            //         veileder = null,
+            //     )
+            // }
+            val oppgaveIdString = it.oppgaveid?.toString() ?: it.oppgaveid?.toString() ?: sykmeldingId
+            val antallSlettedeOppgaver = oppgaveRepository.slettOppgave(oppgaveIdString)
             logger.info("Slettet $antallSlettedeOppgaver oppgaver")
         }
     }

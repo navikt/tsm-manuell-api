@@ -16,3 +16,8 @@ nais:
 kafka:
   topics:
     sykmeldinger: "topic-test-sykmeldinger"
+
+services:
+  gosys:
+    oppgave:
+      url: "http://localhost:8080"

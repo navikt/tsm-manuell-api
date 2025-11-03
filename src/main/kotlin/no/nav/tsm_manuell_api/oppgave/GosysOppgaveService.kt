@@ -1,22 +1,22 @@
 package no.nav.tsm_manuell_api.oppgave
 
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import no.nav.tsm.sykmelding.input.core.model.Aktivitet
 import no.nav.tsm.sykmelding.input.core.model.Sykmelding
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.OPPRETT_OPPGAVE_COUNTER
-import no.nav.tsm_manuell_api.oppgave.client.GosysOppgaveClient
+import no.nav.tsm_manuell_api.oppgave.client.IGosysOppgaveClient
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgave
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveKomplett
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Service
 class GosysOppgaveService(
-    private val gosysOppgaveClient: GosysOppgaveClient,
+    private val gosysOppgaveClient: IGosysOppgaveClient,
 ) {
     val logger = logger()
 
@@ -38,7 +38,7 @@ class GosysOppgaveService(
     }
 
     fun ferdigstillOppgave(
-        manuellOppgave: ManuellOppgaveKomplett,
+        manuellOppgave: ManuellOppgaveDTO,
         enhet: String?,
         veileder: String?
     ) {
@@ -48,9 +48,10 @@ class GosysOppgaveService(
     private fun mapTilOpprettOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgave {
         return GosysOpprettOppgave(
             opprettetAvEnhetsnr = "9999",
-            aktoerId = sykmeldingRecord.sykmelding.pasient.fnr, //er dette aktoerId?
+            aktoerId = sykmeldingRecord.sykmelding.pasient.fnr, // er dette aktoerId?
             behandlesAvApplikasjon = "SMM",
-            beskrivelse = "Manuell vurdering av sykmelding for periode: ${getFomTomTekst(sykmeldingRecord.sykmelding)}",
+            beskrivelse =
+                "Manuell vurdering av sykmelding for periode: ${getFomTomTekst(sykmeldingRecord.sykmelding)}",
             tema = "SYM",
             oppgavetype = "BEH_EL_SYM",
             behandlingstype = "ae0239",

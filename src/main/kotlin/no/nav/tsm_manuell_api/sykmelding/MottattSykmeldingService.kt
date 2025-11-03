@@ -5,8 +5,8 @@ import no.nav.tsm.sykmelding.input.core.model.RuleType
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.tsm_manuell_api.metrics.MESSAGE_STORED_IN_DB_COUNTER
-import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
 import no.nav.tsm_manuell_api.oppgave.GosysOppgaveService
+import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
 import no.nav.tsm_manuell_api.utils.logger
 import no.nav.tsm_manuell_api.utils.objectMapper
 import org.springframework.stereotype.Service
@@ -28,7 +28,9 @@ class MottattSykmeldingService(
             manuellOppgaveService.slettOppgave(sykmeldingId)
         } else {
             val sykmeldingRecord: SykmeldingRecord = objectMapper.readValue(sykmeldingRecordValue)
-            logger.info("Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId . Sjekker om den er behandlet tidligere...")
+            logger.info(
+                "Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId . Sjekker om den er behandlet tidligere..."
+            )
 
             val containsPending =
                 sykmeldingRecord.validation.rules.any { it.type == RuleType.PENDING }
