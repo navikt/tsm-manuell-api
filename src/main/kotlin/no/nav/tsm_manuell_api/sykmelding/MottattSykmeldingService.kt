@@ -6,7 +6,7 @@ import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.tsm_manuell_api.metrics.MESSAGE_STORED_IN_DB_COUNTER
 import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
-import no.nav.tsm_manuell_api.oppgave.OppgaveService
+import no.nav.tsm_manuell_api.oppgave.GosysOppgaveService
 import no.nav.tsm_manuell_api.utils.logger
 import no.nav.tsm_manuell_api.utils.objectMapper
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class MottattSykmeldingService(
     private val manuellOppgaveService: ManuellOppgaveService,
-    private val oppgaveService: OppgaveService,
+    private val gosysOppgaveService: GosysOppgaveService,
 ) {
     val logger = logger()
 
@@ -57,13 +57,13 @@ class MottattSykmeldingService(
         logger.info("Mottatt en manuell oppgave $sykmeldingId")
         INCOMING_MESSAGE_COUNTER.inc()
 
-        if (oppgaveService.erOppgaveOpprettet(sykmeldingId)) {
+        if (manuellOppgaveService.erManuellOppgaveOpprettet(sykmeldingId)) {
             logger.warn(
                 "Manuell oppgave med sykmeldingId $sykmeldingId er allerede opprettet i databasen."
             )
         } else {
-            val gosysOppgave = oppgaveService.opprettGosysOppgave(sykmeldingRecord)
-            oppgaveService.opprettManuellOppgave(sykmeldingRecord, gosysOppgave)
+            val gosysOppgave = gosysOppgaveService.opprettGosysOppgave(sykmeldingRecord)
+            manuellOppgaveService.opprettManuellOppgave(sykmeldingRecord, gosysOppgave)
 
             // manuellOppgaveService.sendSykmeldingRecord()
             MESSAGE_STORED_IN_DB_COUNTER.inc()

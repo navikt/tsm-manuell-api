@@ -1,34 +1,24 @@
 package no.nav.tsm_manuell_api.oppgave
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import no.nav.tsm.sykmelding.input.core.model.Aktivitet
 import no.nav.tsm.sykmelding.input.core.model.Sykmelding
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.OPPRETT_OPPGAVE_COUNTER
 import no.nav.tsm_manuell_api.oppgave.client.GosysOppgaveClient
-import no.nav.tsm_manuell_api.oppgave.model.*
-import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
+import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgave
+import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveKomplett
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Service
-class OppgaveService(
+class GosysOppgaveService(
     private val gosysOppgaveClient: GosysOppgaveClient,
-    private val oppgaveRepository: OppgaveRepository,
 ) {
     val logger = logger()
-
-    companion object {
-        private val statusMap =
-            mapOf(
-                "FERDIGSTILT" to ManuellOppgaveStatus.FERDIGSTILT,
-                "FEILREGISTRERT" to ManuellOppgaveStatus.FEILREGISTRERT,
-                null to ManuellOppgaveStatus.DELETED,
-            )
-    }
 
     fun opprettGosysOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgaveResponse {
         val gosysOpprettOppgave = mapTilOpprettOppgave(sykmeldingRecord)
@@ -67,34 +57,6 @@ class OppgaveService(
             aktivDato = LocalDate.now(),
             fristFerdigstillelse = omTreUkedager(LocalDate.now()),
             prioritet = "HOY",
-        )
-    }
-
-    fun erOppgaveOpprettet(sykmeldingId: String): Boolean {
-        return oppgaveRepository.erManuellOppgaveOpprettet(sykmeldingId)
-    }
-
-    fun opprettManuellOppgave(
-        sykmeldingRecord: SykmeldingRecord,
-        gosysOppgave: GosysOpprettOppgaveResponse
-    ) {
-        val manuellOppgave = mapToManuellOppgave(sykmeldingRecord, gosysOppgave)
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
-        logger.info(
-            "Manuell oppgave lagret i databasen med sykmeldingId ${manuellOppgave.sykmelding.id} og oppgaveId ${manuellOppgave.oppgaveId}"
-        )
-    }
-
-    private fun mapToManuellOppgave(
-        sykmeldingRecord: SykmeldingRecord,
-        oppgave: GosysOpprettOppgaveResponse
-    ): ManuellOppgave {
-        return ManuellOppgave(
-            sykmelding = sykmeldingRecord.sykmelding,
-            ferdigstilt = false,
-            oppgaveId = oppgave.id,
-            status = statusMap[oppgave.status] ?: ManuellOppgaveStatus.APEN,
-            statusTimestamp = oppgave.endretTidspunkt?.toLocalDateTime() ?: LocalDateTime.now()
         )
     }
 
