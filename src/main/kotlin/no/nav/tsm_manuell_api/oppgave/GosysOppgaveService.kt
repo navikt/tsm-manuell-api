@@ -40,19 +40,18 @@ class GosysOppgaveService(
         return gosysOppgaveResponse
     }
 
-    fun ferdigstillOppgave(
-        manuellOppgave: ManuellOppgaveDTO,
-        enhet: String?,
-        veileder: String?
-    ) {
+    fun ferdigstillOppgave(manuellOppgave: ManuellOppgaveDTO, enhet: String?, veileder: String?) {
         TODO("Not yet implemented")
     }
 
     private fun mapTilOpprettOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgave {
-        val person: Person = personService.getPersonMedAktoerId(sykmeldingRecord.sykmelding.pasient.fnr).getOrElse {
-            logger.error("Person ikke funnet i PDL for sykmelding ${sykmeldingRecord.sykmelding.id} ")
-            throw it
-        }
+        val person: Person =
+            personService.getPersonMedAktoerId(sykmeldingRecord.sykmelding.pasient.fnr).getOrElse {
+                logger.error(
+                    "Person ikke funnet i PDL for sykmelding ${sykmeldingRecord.sykmelding.id} "
+                )
+                throw it
+            }
 
         return GosysOpprettOppgave(
             opprettetAvEnhetsnr = "9999",

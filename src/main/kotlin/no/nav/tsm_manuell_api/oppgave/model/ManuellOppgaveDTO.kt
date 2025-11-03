@@ -1,8 +1,7 @@
 package no.nav.tsm_manuell_api.oppgave.model
 
-import no.nav.tsm.sykmelding.input.core.model.Sykmelding
-import no.nav.tsm.sykmelding.input.core.model.ValidationResult
 import java.time.LocalDate
+import no.nav.tsm.sykmelding.input.core.model.Sykmelding
 
 data class ManuellOppgaveDTO(
     val oppgaveid: Int?,

@@ -69,8 +69,12 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
         return namedParameterJdbcTemplate
             .query(sql, params) { rs, _ ->
                 val sykmeldingJson = rs.getString("sykmelding")
-                val sykmelding = objectMapper.readValue(sykmeldingJson, no.nav.tsm.sykmelding.input.core.model.Sykmelding::class.java)
-                
+                val sykmelding =
+                    objectMapper.readValue(
+                        sykmeldingJson,
+                        no.nav.tsm.sykmelding.input.core.model.Sykmelding::class.java
+                    )
+
                 ManuellOppgaveDTO(
                     oppgaveid = rs.getObject("oppgaveid") as? Int,
                     sykmelding = sykmelding,
@@ -78,7 +82,8 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                     ferdigstilt = rs.getBoolean("ferdigstilt"),
                     mottattDato = sykmelding.metadata.mottattDato.toString(),
                     status = rs.getString("status"),
-                    statusTimestamp = rs.getTimestamp("status_timestamp")?.toLocalDateTime()?.toLocalDate()
+                    statusTimestamp =
+                        rs.getTimestamp("status_timestamp")?.toLocalDateTime()?.toLocalDate()
                 )
             }
             .firstOrNull()

@@ -1,9 +1,9 @@
 package no.nav.tsm_manuell_api.person.pdl
 
+import java.time.LocalDate
 import no.nav.tsm.sykmelding.input.core.model.metadata.Navn
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 
 @Profile("local", "test")
 @Component

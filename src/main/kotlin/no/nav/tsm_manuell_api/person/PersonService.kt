@@ -43,17 +43,12 @@ class PersonService(
             )
         }
 
-        val aktoerId =
-            person.identer
-                .find { it.gruppe == IDENT_GRUPPE.AKTORID}
-                ?.ident
+        val aktoerId = person.identer.find { it.gruppe == IDENT_GRUPPE.AKTORID }?.ident
 
         if (aktoerId == null) {
             teamLog.error("No valid AKTORID found for person with ident $ident")
             return Result.failure(
-                IllegalStateException(
-                    "No valid AKTORID found for person, see teamlog for ident"
-                )
+                IllegalStateException("No valid AKTORID found for person, see teamlog for ident")
             )
         }
         return Result.success(

@@ -18,7 +18,7 @@ interface IPdlClient {
 class PdlClient(
     restClientBuilder: RestClient.Builder,
     private val texasClient: TexasClient,
-    @param:Value($$"${services.teamsykmelding.pdlcache.url}") private val pdlEndpointUrl: String,
+    @param:Value($$"${services.tsm.pdlcache.url}") private val pdlEndpointUrl: String,
 ) : IPdlClient {
     private val restClient = restClientBuilder.baseUrl(pdlEndpointUrl).build()
     private val logger = logger()

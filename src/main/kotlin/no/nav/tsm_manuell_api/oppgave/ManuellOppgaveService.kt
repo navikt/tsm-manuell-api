@@ -37,7 +37,8 @@ class ManuellOppgaveService(
             //         veileder = null,
             //     )
             // }
-            val oppgaveIdString = it.oppgaveid?.toString() ?: it.oppgaveid?.toString() ?: sykmeldingId
+            val oppgaveIdString =
+                it.oppgaveid?.toString() ?: it.oppgaveid?.toString() ?: sykmeldingId
             val antallSlettedeOppgaver = oppgaveRepository.slettOppgave(oppgaveIdString)
             logger.info("Slettet $antallSlettedeOppgaver oppgaver")
         }

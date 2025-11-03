@@ -1,7 +1,7 @@
 package no.nav.tsm_manuell_api.person.pdl
 
-import no.nav.tsm.sykmelding.input.core.model.metadata.Navn
 import java.time.LocalDate
+import no.nav.tsm.sykmelding.input.core.model.metadata.Navn
 
 data class PdlPerson(
     val navn: Navn?,
