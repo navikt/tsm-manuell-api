@@ -58,7 +58,7 @@ class OppgaveService(
     private fun mapTilOpprettOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgave {
         return GosysOpprettOppgave(
             opprettetAvEnhetsnr = "9999",
-            aktoerId = TODO(),
+            aktoerId = sykmeldingRecord.sykmelding.pasient.fnr, //er dette aktoerId?
             behandlesAvApplikasjon = "SMM",
             beskrivelse = "Manuell vurdering av sykmelding for periode: ${getFomTomTekst(sykmeldingRecord.sykmelding)}",
             tema = "SYM",

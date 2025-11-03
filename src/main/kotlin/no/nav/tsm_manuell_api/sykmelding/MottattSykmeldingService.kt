@@ -28,7 +28,7 @@ class MottattSykmeldingService(
             manuellOppgaveService.slettOppgave(sykmeldingId)
         } else {
             val sykmeldingRecord: SykmeldingRecord = objectMapper.readValue(sykmeldingRecordValue)
-            logger.info("Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId")
+            logger.info("Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId . Sjekker om den er behandlet tidligere...")
 
             val containsPending =
                 sykmeldingRecord.validation.rules.any { it.type == RuleType.PENDING }
@@ -38,7 +38,7 @@ class MottattSykmeldingService(
                 handleOpprettManuellOppgave(sykmeldingRecord, metadata)
             } else if (containsOk) {
                 logger.info(
-                    "Sykmelding med id: $sykmeldingId inneholder RuleType.OK, er dermed behandlet manuelt tidligere. Sletter eventuell manuell oppgave."
+                    "Sykmelding med id: $sykmeldingId inneholder nå RuleType.OK, er dermed behandlet manuelt tidligere. Sletter eventuell manuell oppgave."
                 )
                 manuellOppgaveService.slettOppgave(sykmeldingId)
             } else {
