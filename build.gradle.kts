@@ -9,7 +9,7 @@ description = "App for manuell behandling av tilbakedaterte sykmeldinger"
 val javaVersion = JvmTarget.JVM_21
 
 val ktfmtVersion = "0.44"
-val sykmeldingInputVersion = "13"
+val sykmeldingInputVersion = "16"
 
 plugins {
 	kotlin("jvm") version "2.2.21"

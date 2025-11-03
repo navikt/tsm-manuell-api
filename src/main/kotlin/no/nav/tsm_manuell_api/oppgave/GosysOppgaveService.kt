@@ -11,12 +11,15 @@ import no.nav.tsm_manuell_api.oppgave.client.IGosysOppgaveClient
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgave
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
+import no.nav.tsm_manuell_api.person.Person
+import no.nav.tsm_manuell_api.person.PersonService
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
 
 @Service
 class GosysOppgaveService(
     private val gosysOppgaveClient: IGosysOppgaveClient,
+    private val personService: PersonService,
 ) {
     val logger = logger()
 
@@ -46,9 +49,14 @@ class GosysOppgaveService(
     }
 
     private fun mapTilOpprettOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgave {
+        val person: Person = personService.getPersonMedAktoerId(sykmeldingRecord.sykmelding.pasient.fnr).getOrElse {
+            logger.error("Person ikke funnet i PDL for sykmelding ${sykmeldingRecord.sykmelding.id} ")
+            throw it
+        }
+
         return GosysOpprettOppgave(
             opprettetAvEnhetsnr = "9999",
-            aktoerId = sykmeldingRecord.sykmelding.pasient.fnr, // er dette aktoerId?
+            aktoerId = person.aktoerId,
             behandlesAvApplikasjon = "SMM",
             beskrivelse =
                 "Manuell vurdering av sykmelding for periode: ${getFomTomTekst(sykmeldingRecord.sykmelding)}",

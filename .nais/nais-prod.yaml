@@ -63,3 +63,5 @@ spec:
   env:
     - name: GOSYS_OPPGAVE_URL
       value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
+    - name: TSM_PDL_ENDPOINT_URL
+      value: http://tsm-pdl-cache
