@@ -11,20 +11,18 @@ import no.nav.tsm_manuell_api.oppgave.client.IGosysOppgaveClient
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgave
 import no.nav.tsm_manuell_api.oppgave.model.GosysOpprettOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
-import no.nav.tsm_manuell_api.person.Person
-import no.nav.tsm_manuell_api.person.PersonService
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
 
 @Service
-class GosysOppgaveService(
-    private val gosysOppgaveClient: IGosysOppgaveClient,
-    private val personService: PersonService,
-) {
+class GosysOppgaveService(private val gosysOppgaveClient: IGosysOppgaveClient) {
     val logger = logger()
 
-    fun opprettGosysOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgaveResponse {
-        val gosysOpprettOppgave = mapTilOpprettOppgave(sykmeldingRecord)
+    fun opprettGosysOppgave(
+        sykmeldingRecord: SykmeldingRecord,
+        aktoerId: String
+    ): GosysOpprettOppgaveResponse {
+        val gosysOpprettOppgave = mapTilOpprettOppgave(sykmeldingRecord, aktoerId)
         val gosysOppgaveResponse =
             gosysOppgaveClient.opprettOppgave(gosysOpprettOppgave).fold({ it }) {
                 logger.error(
@@ -40,22 +38,13 @@ class GosysOppgaveService(
         return gosysOppgaveResponse
     }
 
-    fun ferdigstillOppgave(manuellOppgave: ManuellOppgaveDTO, enhet: String?, veileder: String?) {
-        TODO("Not yet implemented")
-    }
-
-    private fun mapTilOpprettOppgave(sykmeldingRecord: SykmeldingRecord): GosysOpprettOppgave {
-        val person: Person =
-            personService.getPersonMedAktoerId(sykmeldingRecord.sykmelding.pasient.fnr).getOrElse {
-                logger.error(
-                    "Person ikke funnet i PDL for sykmelding ${sykmeldingRecord.sykmelding.id} "
-                )
-                throw it
-            }
-
+    private fun mapTilOpprettOppgave(
+        sykmeldingRecord: SykmeldingRecord,
+        aktoerId: String
+    ): GosysOpprettOppgave {
         return GosysOpprettOppgave(
             opprettetAvEnhetsnr = "9999",
-            aktoerId = person.aktoerId,
+            aktoerId = aktoerId,
             behandlesAvApplikasjon = "SMM",
             beskrivelse =
                 "Manuell vurdering av sykmelding for periode: ${getFomTomTekst(sykmeldingRecord.sykmelding)}",
@@ -66,6 +55,10 @@ class GosysOppgaveService(
             fristFerdigstillelse = omTreUkedager(LocalDate.now()),
             prioritet = "HOY",
         )
+    }
+
+    fun ferdigstillOppgave(manuellOppgave: ManuellOppgaveDTO, enhet: String?, veileder: String?) {
+        TODO("Not yet implemented")
     }
 
     fun omTreUkedager(idag: LocalDate): LocalDate =
