@@ -35,6 +35,15 @@ spring:
         provider:
           aad:
             issuer-uri: ${azure.openid.config.issuer}
+        registration:
+          pdlcache-m2m:
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            provider: aad
+            scope:
+              - ${tsmpdl.scope}
   kafka:
     bootstrap-servers: ${kafka.brokers}
     security:
@@ -70,3 +79,6 @@ services:
   gosys:
     oppgave:
       url: ${GOSYS_OPPGAVE_URL}
+  tsm:
+    pdlcache:
+      url: ${TSM_PDL_ENDPOINT_URL}
