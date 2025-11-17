@@ -20,6 +20,14 @@ data class GosysOpprettOppgave(
     val prioritet: String,
 )
 
+data class HentOppgave(
+    val aktoerId: String,
+    val tema: String,
+    val behandlesAvApplikasjon: String,
+    val oppgavetype: String,
+    val behandlingstype: String,
+)
+
 data class FerdigstillOppgave(
     val versjon: Int,
     val id: Int,
@@ -59,6 +67,11 @@ data class GosysOpprettOppgaveResponse(
     val endretTidspunkt: ZonedDateTime? = null,
     val beskrivelse: String? = null,
     val fristFerdigstillelse: LocalDate? = null,
+)
+
+data class GosysHentOppgaveResponse(
+    val antallTreffTotalt: Int,
+    val oppgaver: List<GosysOpprettOppgaveResponse>
 )
 
 enum class OppgaveStatus(val status: String) {
