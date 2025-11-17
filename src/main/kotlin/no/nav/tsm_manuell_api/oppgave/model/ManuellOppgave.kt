@@ -11,6 +11,13 @@ data class ManuellOppgave(
     val statusTimestamp: LocalDateTime,
 )
 
+data class TemporaryManuellOppgave(
+    val sykmelding: Sykmelding,
+    val ferdigstilt: Boolean = false,
+    val status: ManuellOppgaveStatus? = null,
+    val statusTimestamp: LocalDateTime,
+)
+
 enum class ManuellOppgaveStatus {
     APEN,
     FERDIGSTILT,

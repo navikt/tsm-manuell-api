@@ -69,9 +69,15 @@ class MottattSykmeldingService(
                 "Manuell oppgave med sykmeldingId $sykmeldingId er allerede opprettet i databasen."
             )
         } else {
-            val gosysOppgave =
-                gosysOppgaveService.opprettGosysOppgave(sykmeldingRecord, person.aktoerId)
-            manuellOppgaveService.opprettManuellOppgave(sykmeldingRecord, gosysOppgave)
+            // **IMPORTANT **Temporarily disable create gosys oppgave until we are ready to put this
+            // into production and turn off Syfossmmanuell. This avoids us having two apps creating
+            // gosys oppgave. - DO NOT DELETE
+            //            val gosysOppgave =
+            //                gosysOppgaveService.opprettGosysOppgave(sykmeldingRecord,
+            // person.aktoerId)
+
+            //            manuellOppgaveService.lagreManuellOppgave(sykmeldingRecord, gosysOppgave)
+            manuellOppgaveService.temporaryLagreManuellOppgave(sykmeldingRecord)
 
             // manuellOppgaveService.sendSykmeldingRecord()
             MESSAGE_STORED_IN_DB_COUNTER.inc()

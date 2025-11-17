@@ -2,6 +2,7 @@ package no.nav.tsm_manuell_api.oppgave.repository
 
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
+import no.nav.tsm_manuell_api.oppgave.model.TemporaryManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.model.UlosteOppgave
 import no.nav.tsm_manuell_api.utils.objectMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -11,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 @Transactional
 class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate) {
+
+    // this is the method we actually want to use in the future - do not delete it.. We need
+    // oppgaveId which we wont have in this first iteration.
     fun opprettManuellOppgave(manuellOppgave: ManuellOppgave) {
         val sql =
             """
@@ -48,6 +52,40 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
         namedParameterJdbcTemplate.update(sql, params)
     }
 
+    fun temporaryOpprettManuellOppgave(temporaryManuellOppgave: TemporaryManuellOppgave) {
+        val sql =
+            """
+            INSERT INTO manuelloppgave (
+                id, 
+                sykmelding, 
+                pasientIdent, 
+                ferdigstilt, 
+                status, 
+                status_timestamp
+            ) VALUES (
+                :id, 
+                :sykmelding::jsonb, 
+                :pasientIdent, 
+                :ferdigstilt, 
+                :status, 
+                :statusTimestamp
+            )
+        """
+                .trimIndent()
+
+        val params =
+            mapOf(
+                "id" to temporaryManuellOppgave.sykmelding.id,
+                "sykmelding" to objectMapper.writeValueAsString(temporaryManuellOppgave.sykmelding),
+                "pasientIdent" to temporaryManuellOppgave.sykmelding.pasient.fnr,
+                "ferdigstilt" to temporaryManuellOppgave.ferdigstilt,
+                "status" to temporaryManuellOppgave.status?.name,
+                "statusTimestamp" to temporaryManuellOppgave.statusTimestamp
+            )
+
+        namedParameterJdbcTemplate.update(sql, params)
+    }
+
     fun hentManuellOppgaveForSykmeldingId(sykmeldingId: String): ManuellOppgaveDTO? {
         val sql =
             """
@@ -56,7 +94,6 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                 sykmelding,
                 pasientIdent,
                 ferdigstilt,
-                oppgaveid,
                 status,
                 status_timestamp
             FROM manuelloppgave 
@@ -76,7 +113,7 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                     )
 
                 ManuellOppgaveDTO(
-                    oppgaveid = rs.getObject("oppgaveid") as? Int,
+                    //                    oppgaveid = rs.getObject("oppgaveid") as? Int,
                     sykmelding = sykmelding,
                     ident = rs.getString("pasientIdent"),
                     ferdigstilt = rs.getBoolean("ferdigstilt"),

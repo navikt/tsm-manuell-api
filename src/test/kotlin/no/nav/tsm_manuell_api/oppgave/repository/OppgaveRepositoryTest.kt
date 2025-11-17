@@ -8,6 +8,7 @@ import no.nav.tsm.sykmelding.input.core.model.Pasient
 import no.nav.tsm.sykmelding.input.core.model.metadata.*
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
+import no.nav.tsm_manuell_api.oppgave.model.TemporaryManuellOppgave
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -64,10 +65,10 @@ class OppgaveRepositoryTest {
     fun `opprettManuellOppgave should create entry in database using ManuellOppgave object`() {
         // Given: A ManuellOppgave object
         val manuellOppgave =
-            createTestManuellOppgave("test-sykmelding-1", ManuellOppgaveStatus.APEN)
+            createTemporaryTestManuellOppgave("test-sykmelding-1", ManuellOppgaveStatus.APEN)
 
         // When: Calling opprettManuellOppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
 
         // Then: Oppgave should exist in database
         val exists = oppgaveRepository.erManuellOppgaveOpprettet("test-sykmelding-1")
@@ -75,15 +76,16 @@ class OppgaveRepositoryTest {
     }
 
     @Test
-    fun `opprettManuellOppgave should correctly store all fields`() {
+    fun `temporaryOpprettManuellOppgave should correctly store all fields`() {
         // Given: A ManuellOppgave with specific values
         val sykmeldingId = "test-sykmelding-3"
         val oppgaveId = 98765
         val status = ManuellOppgaveStatus.APEN
-        val manuellOppgave = createTestManuellOppgave(sykmeldingId, status, oppgaveId)
+        //        val manuellOppgave = createTestManuellOppgave(sykmeldingId, status, oppgaveId)
+        val manuellOppgave = createTemporaryTestManuellOppgave(sykmeldingId, status)
 
         // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
 
         // Then: All fields should be stored correctly
         val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
@@ -91,36 +93,38 @@ class OppgaveRepositoryTest {
         assertEquals(sykmeldingId, result!!.sykmelding.id)
         assertEquals("12345678910", result.ident)
         assertEquals(false, result.ferdigstilt)
-        assertEquals(oppgaveId, result.oppgaveid)
+        //        assertEquals(oppgaveId, result.oppgaveid)
         assertEquals(status.name, result.status)
     }
 
     @Test
-    fun `opprettManuellOppgave should handle null oppgaveid and status`() {
+    fun `temporaryOpprettManuellOppgave should handle null oppgaveid and status`() {
         // Given: A ManuellOppgave with null oppgaveid and status
         val sykmeldingId = "test-sykmelding-4"
-        val manuellOppgave = createTestManuellOppgave(sykmeldingId, null, null)
+        val manuellOppgave = createTemporaryTestManuellOppgave(sykmeldingId, null)
 
         // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
 
         // Then: Oppgave should be created with null values
         val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
         assertNotNull(result)
         assertEquals(sykmeldingId, result!!.sykmelding.id)
-        assertEquals(null, result.oppgaveid)
+        //        assertEquals(null, result.oppgaveid)
         assertEquals(null, result.status)
     }
 
     @Test
-    fun `opprettManuellOppgave should serialize sykmelding as JSON`() {
+    fun `temporaryOpprettManuellOppgave should serialize sykmelding as JSON`() {
         // Given: A ManuellOppgave
         val sykmeldingId = "test-sykmelding-5"
+        //        val manuellOppgave =
+        //            createTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
         val manuellOppgave =
-            createTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
+            createTemporaryTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
 
         // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
 
         // Then: Sykmelding should be retrievable and contain correct data
         val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
@@ -143,15 +147,30 @@ class OppgaveRepositoryTest {
     fun `erManuellOppgaveOpprettet should return true when oppgave exists`() {
         // Given: Insert a manuell oppgave
         val sykmeldingId = "test-sykmelding-2"
-        val manuellOppgave =
-            createTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        //        val manuellOppgave =
+        //            createTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
+        val manuellOppgave = createTemporaryTestManuellOppgave(sykmeldingId, null)
+        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
 
         // When: Check if oppgave exists
         val exists = oppgaveRepository.erManuellOppgaveOpprettet(sykmeldingId)
 
         // Then: Should return true
         assertTrue(exists)
+    }
+
+    private fun createTemporaryTestManuellOppgave(
+        sykmeldingId: String,
+        status: ManuellOppgaveStatus?,
+    ): TemporaryManuellOppgave {
+        val sykmelding = createTestXmlSykmelding(sykmeldingId)
+
+        return TemporaryManuellOppgave(
+            sykmelding = sykmelding,
+            ferdigstilt = false,
+            status = status,
+            statusTimestamp = LocalDateTime.now(),
+        )
     }
 
     private fun createTestManuellOppgave(

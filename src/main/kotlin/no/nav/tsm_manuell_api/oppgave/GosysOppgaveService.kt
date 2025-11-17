@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service
 class GosysOppgaveService(private val gosysOppgaveClient: IGosysOppgaveClient) {
     val logger = logger()
 
+    // **IMPORTANT **Temporarily disable create gosys oppgave until we are ready to put this into
+    // production and turn off Syfossmmanuell. This avoids us having two apps creating gosys
+    // oppgave. - DO NOT DELETE
     fun opprettGosysOppgave(
         sykmeldingRecord: SykmeldingRecord,
         aktoerId: String
