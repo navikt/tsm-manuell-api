@@ -41,7 +41,7 @@ class ManuellOppgaveService(
                 sykmelding = sykmeldingRecord.sykmelding,
                 ferdigstilt = false,
                 status = ManuellOppgaveStatus.APEN,
-                statusTimestamp = LocalDateTime.now()
+                statusTimestamp = LocalDateTime.from(sykmeldingRecord.validation.timestamp)
             )
         oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
         //        logger.info(
@@ -74,7 +74,7 @@ class ManuellOppgaveService(
     //            oppgaveId = oppgave.id,
     //            status = statusMap[oppgave.status] ?: ManuellOppgaveStatus.APEN,
     //            statusTimestamp = oppgave.endretTidspunkt?.toLocalDateTime() ?:
-    // LocalDateTime.now()
+    // LocalDateTime.from(sykmeldingRecord.validation.timestamp)
     //        )
     //    }
 }

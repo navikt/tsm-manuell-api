@@ -35,10 +35,10 @@ class MottattSykmeldingService(
                 "Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId . Sjekker om den er behandlet tidligere..."
             )
 
-            val person = finnAktorId(sykmeldingRecord) ?: return
             val validationRules = sykmeldingRecord.validation.rules
             if (containsPending(validationRules) && !containsOk(validationRules)) {
-                handleOpprettManuellOppgave(sykmeldingRecord, metadata, person)
+                //            val person = finnAktorId(sykmeldingRecord) ?: return
+                handleOpprettManuellOppgave(sykmeldingRecord, metadata, null)
             } else if (containsOk(validationRules)) {
                 logger.info(
                     "Sykmelding med id: $sykmeldingId inneholder nå RuleType.OK, er dermed behandlet manuelt tidligere. Sletter eventuell manuell oppgave."
@@ -58,7 +58,7 @@ class MottattSykmeldingService(
     private fun handleOpprettManuellOppgave(
         sykmeldingRecord: SykmeldingRecord,
         metadata: Map<String, ByteArray>,
-        person: Person
+        person: Person?
     ) {
         val sykmeldingId = sykmeldingRecord.sykmelding.id
         logger.info("Mottatt en sykmelding $sykmeldingId der det skal opprettes manuell oppgave")
