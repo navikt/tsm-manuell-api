@@ -31,7 +31,6 @@ jobs:
           ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           team: tsm
-          image_suffix: dev
     outputs:
       image: "${{ steps.docker-build-push.outputs.image }}"
 
