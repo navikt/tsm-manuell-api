@@ -155,7 +155,16 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     }
 
     fun slettOppgave(sykmeldingId: String) {
-        TODO("IMPLEMENT")
+        val sql =
+            """
+            DELETE FROM manuelloppgave 
+            WHERE id = :sykmeldingId
+        """
+                .trimIndent()
+
+        val params = mapOf("sykmeldingId" to sykmeldingId)
+
+        namedParameterJdbcTemplate.update(sql, params)
     }
 
     fun oppdaterOppgaveHendelse(oppgaveId: String, hendelse: String) {

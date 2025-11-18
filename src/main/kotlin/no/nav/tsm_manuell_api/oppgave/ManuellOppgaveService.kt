@@ -24,7 +24,10 @@ class ManuellOppgaveService(
             )
     }
 
-    fun slettOppgave(sykmeldingId: String) {}
+    fun slettOppgave(sykmeldingId: String) {
+        logger.info("Sykmelding har blitt behandlet tidligere og er OK, Sletter oppgave med sykmeldingId $sykmeldingId")
+        oppgaveRepository.slettOppgave(sykmeldingId)
+    }
 
     fun isOpprettetManuellOppgave(sykmeldingId: String): Boolean {
         TODO("IMPLEMENT")
