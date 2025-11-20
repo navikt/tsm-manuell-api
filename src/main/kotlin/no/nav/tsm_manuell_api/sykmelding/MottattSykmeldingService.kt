@@ -79,7 +79,7 @@ class MottattSykmeldingService(
             //            manuellOppgaveService.lagreManuellOppgave(sykmeldingRecord, gosysOppgave)
             manuellOppgaveService.temporaryLagreManuellOppgave(sykmeldingRecord)
 
-            // manuellOppgaveService.sendSykmeldingRecord()
+            //             manuellOppgaveService.sendSykmeldingRecord()
             MESSAGE_STORED_IN_DB_COUNTER.inc()
         }
     }
