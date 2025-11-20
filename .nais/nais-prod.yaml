@@ -65,3 +65,5 @@ spec:
       value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
     - name: TSM_PDL_ENDPOINT_URL
       value: http://tsm-pdl-cache
+    - name: SYFOSMMANUELL_URL
+      value: http://syfosmmanuell-backend

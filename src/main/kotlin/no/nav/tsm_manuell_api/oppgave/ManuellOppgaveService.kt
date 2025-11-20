@@ -2,8 +2,9 @@ package no.nav.tsm_manuell_api.oppgave
 
 import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
+import no.nav.tsm_manuell_api.oppgave.client.ISyfoSmManuellClient
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
-import no.nav.tsm_manuell_api.oppgave.model.TemporaryManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service
 class ManuellOppgaveService(
     private val oppgaveRepository: OppgaveRepository,
     private val oppgaveService: GosysOppgaveService,
+    private val syfoSmManuellClient: ISyfoSmManuellClient,
 ) {
     val logger = logger()
 
@@ -25,7 +27,9 @@ class ManuellOppgaveService(
     }
 
     fun slettOppgave(sykmeldingId: String) {
-        logger.info("Sykmelding har blitt behandlet tidligere og er OK, Sletter oppgave med sykmeldingId $sykmeldingId")
+        logger.info(
+            "Sykmelding har blitt behandlet tidligere og er OK, Sletter oppgave med sykmeldingId $sykmeldingId"
+        )
         oppgaveRepository.slettOppgave(sykmeldingId)
     }
 
@@ -38,21 +42,20 @@ class ManuellOppgaveService(
     }
 
     fun temporaryLagreManuellOppgave(sykmeldingRecord: SykmeldingRecord) {
+        val syfosmManuellOppgave =
+            syfoSmManuellClient.hentOppgaveId(sykmeldingRecord.sykmelding.id).getOrElse { null }
 
         val manuellOppgave =
-            TemporaryManuellOppgave(
+            ManuellOppgave(
                 sykmelding = sykmeldingRecord.sykmelding,
                 ferdigstilt = false,
+                oppgaveId = syfosmManuellOppgave?.oppgaveId,
                 status = ManuellOppgaveStatus.APEN,
                 statusTimestamp = LocalDateTime.from(sykmeldingRecord.validation.timestamp)
             )
-        oppgaveRepository.temporaryOpprettManuellOppgave(manuellOppgave)
-        //        logger.info(
-        //            "Manuell oppgave lagret i databasen med sykmeldingId
-        // ${manuellOppgave.sykmelding.id} og oppgaveId ${manuellOppgave.oppgaveId}"
-        //        )
+        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
         logger.info(
-            "Manuell oppgave lagret i databasen med sykmeldingId ${manuellOppgave.sykmelding.id} , men uten oppgaveId."
+            "Manuell oppgave lagret i databasen med sykmeldingId${manuellOppgave.sykmelding.id} og oppgaveId ${manuellOppgave.oppgaveId}"
         )
     }
     //    fun lagreManuellOppgave(

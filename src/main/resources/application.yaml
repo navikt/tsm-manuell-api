@@ -79,6 +79,8 @@ services:
   gosys:
     oppgave:
       url: ${GOSYS_OPPGAVE_URL}
+  syfosmmanuell:
+    url: ${SYFOSMMANUELL_URL}
   tsm:
     pdlcache:
       url: ${TSM_PDL_ENDPOINT_URL}
