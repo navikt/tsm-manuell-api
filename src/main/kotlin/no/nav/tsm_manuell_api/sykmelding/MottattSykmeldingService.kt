@@ -31,9 +31,6 @@ class MottattSykmeldingService(
     ) {
         if (sykmeldingRecordValue != null) {
             val sykmeldingRecord: SykmeldingRecord = objectMapper.readValue(sykmeldingRecordValue)
-            logger.info(
-                "Sykmelding mottatt for manuell behandling, sykmeldingId=$sykmeldingId . Sjekker om den er behandlet tidligere..."
-            )
 
             val validationRules = sykmeldingRecord.validation.rules
             if (containsPending(validationRules) && !containsOk(validationRules)) {
@@ -45,7 +42,7 @@ class MottattSykmeldingService(
                 )
                 manuellOppgaveService.slettOppgave(sykmeldingId)
             } else {
-                logger.info(
+                logger.warn(
                     "Sykmelding med id: $sykmeldingId inneholder ikke RuleType.PENDING eller inneholder RuleType.OK, hopper over manuell behandling"
                 )
             }
