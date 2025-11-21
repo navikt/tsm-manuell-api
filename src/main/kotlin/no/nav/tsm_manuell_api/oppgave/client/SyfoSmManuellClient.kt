@@ -28,7 +28,7 @@ class SyfoSmManuellClient(
             val response: SmmOppgaveResponse? =
                 restClient
                     .get()
-                    .uri("/oppgave/sykmelding/{sykmeldingId}", sykmeldingId)
+                    .uri("/api/v1/oppgave/sykmelding/{sykmeldingId}", sykmeldingId)
                     .headers {
                         it.set("Nav-Consumer-Id", "tsm-manuell-api")
                         it.set("Authorization", "Bearer $accessToken")
@@ -47,7 +47,7 @@ class SyfoSmManuellClient(
     }
 
     private fun getToken(): TexasClient.TokenResponse =
-        texasClient.requestToken("gcp", "syfosmmanuell")
+        texasClient.requestToken("teamsykmelding", "syfosmmanuell-backend")
 }
 
 data class SmmOppgaveResponse(val oppgaveId: Int, val sykmeldingId: String)
