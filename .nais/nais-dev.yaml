@@ -73,4 +73,4 @@ spec:
     - name: TSM_PDL_ENDPOINT_URL
       value: http://tsm-pdl-cache
     - name: SYFOSMMANUELL_URL
-      value: http://dev-gcp.teamsykmelding.syfosmmanuell-backend
+      value: http://syfosmmanuell-backend.teamsykmelding
