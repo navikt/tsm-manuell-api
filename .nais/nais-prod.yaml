@@ -4,6 +4,13 @@ metadata:
   name: tsm-manuell-api
   namespace: tsm
 spec:
+  accessPolicy:
+    outbound:
+      rules:
+        - application: syfosmmanuell-backend
+          namespace: teamsykmelding
+        - application: logging
+          namespace: nais-system
   gcp:
     sqlInstances:
       - type: POSTGRES_17
