@@ -57,6 +57,7 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                 sykmelding,
                 pasientIdent,
                 ferdigstilt,
+                oppgaveid,
                 status,
                 status_timestamp
             FROM manuelloppgave 
@@ -76,7 +77,7 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                     )
 
                 ManuellOppgaveDTO(
-                    //                    oppgaveid = rs.getObject("oppgaveid") as? Int,
+                    oppgaveid = rs.getObject("oppgaveid") as? Int,
                     sykmelding = sykmelding,
                     ident = rs.getString("pasientIdent"),
                     ferdigstilt = rs.getBoolean("ferdigstilt"),
@@ -143,7 +144,16 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     }
 
     fun hentManuellOppgave(oppgaveId: String): ManuellOppgaveDTO? {
-        TODO("IMPLEMENT")
+        val sql =
+            """
+                SELECT * FROM manuelloppgave 
+                WHERE id = :oppgaveId
+            """
+                .trimIndent()
+
+        val params = mapOf("oppgaveId" to oppgaveId)
+
+        return namedParameterJdbcTemplate.queryForObject(sql, params, ManuellOppgaveDTO::class.java)
     }
 
     fun hentKompletteManuellOppgave(oppgaveId: String) {

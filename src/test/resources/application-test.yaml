@@ -9,6 +9,30 @@ spring:
     bootstrap-servers: localhost:9999
     security:
       protocol: plaintext
+  security:
+    oauth2:
+      client:
+        provider:
+          aad:
+            issuer-uri: http://localhost:8080
+        registration:
+          pdlcache-m2m:
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
+            client-id: test-client-id
+            client-secret: test-client-secret
+            provider: aad
+            scope:
+              - test-scope
+
+azure:
+  openid:
+    config:
+      issuer: http://localhost:8080
+  app:
+    client:
+      id: test-client-id
+      secret: test-client-secret
 
 nais:
   token_endpoint: "http://localhost:8084/nais/token"
@@ -22,3 +46,6 @@ services:
   gosys:
     oppgave:
       url: "http://localhost:8080"
+
+tsmpdl:
+  scope: test-scope

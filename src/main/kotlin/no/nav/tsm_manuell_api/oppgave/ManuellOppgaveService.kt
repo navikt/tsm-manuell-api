@@ -4,6 +4,8 @@ import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.oppgave.client.ISyfoSmManuellClient
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
 import no.nav.tsm_manuell_api.utils.logger
@@ -53,6 +55,29 @@ class ManuellOppgaveService(
         oppgaveRepository.opprettManuellOppgave(manuellOppgave)
         logger.info(
             "Manuell oppgave lagret i databasen med sykmeldingId${manuellOppgave.sykmelding.id} og oppgaveId ${manuellOppgave.oppgaveId}"
+        )
+    }
+
+    fun hentOppgave(oppgaveId: String): Result<ManuellOppgaveResponse> {
+        val dto =
+            oppgaveRepository.hentManuellOppgave(oppgaveId)
+                ?: return Result.failure(Exception("Fant ikke oppgave med id $oppgaveId"))
+
+        val manuellOppgaveResponse = mapToManuellOppgaveResponse(dto)
+        return Result.success(manuellOppgaveResponse)
+    }
+
+    private fun mapToManuellOppgaveResponse(dto: ManuellOppgaveDTO): ManuellOppgaveResponse {
+        val oppgaveId = dto.oppgaveid
+        requireNotNull(oppgaveId)
+        return ManuellOppgaveResponse(
+            oppgaveId = oppgaveId,
+            sykmelding = dto.sykmelding,
+            ident = dto.ident,
+            ferdigstilt = dto.ferdigstilt,
+            mottattDato = dto.mottattDato,
+            status = dto.status,
+            statusTimestamp = dto.statusTimestamp,
         )
     }
     //    fun lagreManuellOppgave(

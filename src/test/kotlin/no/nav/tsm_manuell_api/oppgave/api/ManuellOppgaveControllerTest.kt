@@ -1,34 +1,34 @@
-package no.nav.tsm_manuell_api.oppgave.repository
+package no.nav.tsm_manuell_api.oppgave.api
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import no.nav.tsm.sykmelding.input.core.model.*
 import no.nav.tsm.sykmelding.input.core.model.Pasient
 import no.nav.tsm.sykmelding.input.core.model.metadata.*
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
-/**
- * Integration tests for OppgaveRepository using Postgres Testcontainers. Tests the database
- * operations for creating and checking manuell oppgave existence.
- */
 @Testcontainers
 @SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-class OppgaveRepositoryTest {
+class ManuellOppgaveControllerTest {
 
     companion object {
         @Container
@@ -51,120 +51,118 @@ class OppgaveRepositoryTest {
         }
     }
 
-    @Autowired private lateinit var oppgaveRepository: OppgaveRepository
+    @Autowired private lateinit var mockMvc: MockMvc
 
-    @Autowired private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    @MockitoBean private lateinit var manuellOppgaveService: ManuellOppgaveService
 
-    @BeforeEach
-    fun setup() {
-        jdbcTemplate.jdbcTemplate.execute("TRUNCATE TABLE manuelloppgave CASCADE")
+    @Test
+    fun `hentOppgave should return 200 OK with ManuellOppgaveResponse when oppgave exists`() {
+        // Given
+        val oppgaveId = "test-sykmelding-123"
+        val expectedOppgaveId = 12345
+        val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, expectedOppgaveId)
+
+        `when`(manuellOppgaveService.hentOppgave(oppgaveId))
+            .thenReturn(Result.success(expectedResponse))
+
+        // When/Then
+        mockMvc
+            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.oppgaveId").value(expectedOppgaveId))
+            .andExpect(jsonPath("$.ident").value("12345678910"))
+            .andExpect(jsonPath("$.ferdigstilt").value(false))
+            .andExpect(jsonPath("$.status").value("APEN"))
+            .andExpect(jsonPath("$.sykmelding.id").value(oppgaveId))
+            .andExpect(jsonPath("$.sykmelding.pasient.fnr").value("12345678910"))
+            .andExpect(jsonPath("$.sykmelding.pasient.navn.fornavn").value("Test"))
+            .andExpect(jsonPath("$.sykmelding.pasient.navn.etternavn").value("Testesen"))
     }
 
     @Test
-    fun `opprettManuellOppgave should create entry in database using ManuellOppgave object`() {
-        // Given: A ManuellOppgave object
-        val manuellOppgave =
-            createTestManuellOppgave("test-sykmelding-1", ManuellOppgaveStatus.APEN)
+    fun `hentOppgave should return 404 NOT FOUND when oppgave does not exist`() {
+        // Given
+        val oppgaveId = "non-existent-oppgave"
 
-        // When: Calling opprettManuellOppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        `when`(manuellOppgaveService.hentOppgave(oppgaveId))
+            .thenReturn(Result.failure(Exception("Fant ikke oppgave med id $oppgaveId")))
 
-        // Then: Oppgave should exist in database
-        val exists = oppgaveRepository.erManuellOppgaveOpprettet("test-sykmelding-1")
-        assertTrue(exists)
+        // When/Then
+        mockMvc.perform(get("/api/oppgave/{oppgaveId}", oppgaveId)).andExpect(status().isNotFound)
     }
 
     @Test
-    fun `opprettManuellOppgave should correctly store all fields`() {
-        // Given: A ManuellOppgave with specific values
-        val sykmeldingId = "test-sykmelding-3"
-        val oppgaveId = 98765
-        val status = ManuellOppgaveStatus.APEN
-        val manuellOppgave = createTestManuellOppgave(sykmeldingId, status, oppgaveId)
+    fun `hentOppgave should return correct mottattDato format`() {
+        // Given
+        val oppgaveId = "test-sykmelding-456"
+        val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 67890)
 
-        // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        `when`(manuellOppgaveService.hentOppgave(oppgaveId))
+            .thenReturn(Result.success(expectedResponse))
 
-        // Then: All fields should be stored correctly
-        val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
-        assertNotNull(result)
-        assertEquals(sykmeldingId, result!!.sykmelding.id)
-        assertEquals("12345678910", result.ident)
-        assertEquals(false, result.ferdigstilt)
-        assertEquals(status.name, result.status)
+        // When/Then
+        mockMvc
+            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.mottattDato").exists())
+            .andExpect(jsonPath("$.mottattDato").isString)
     }
 
     @Test
-    fun `opprettManuellOppgave should handle null oppgaveid and status`() {
-        // Given: A ManuellOppgave with null oppgaveid and status
-        val sykmeldingId = "test-sykmelding-4"
-        val manuellOppgave = createTestManuellOppgave(sykmeldingId, null, null)
+    fun `hentOppgave should include sykmelding medical information`() {
+        // Given
+        val oppgaveId = "test-sykmelding-789"
+        val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 11111)
 
-        // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        `when`(manuellOppgaveService.hentOppgave(oppgaveId))
+            .thenReturn(Result.success(expectedResponse))
 
-        // Then: Oppgave should be created with null values
-        val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
-        requireNotNull(result)
-        assertNotNull(result)
-        assertEquals(sykmeldingId, result.sykmelding.id)
-        assertEquals(null, result.status)
+        // When/Then
+        mockMvc
+            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.sykmelding.medisinskVurdering.hovedDiagnose.kode").value("L87"))
+            .andExpect(
+                jsonPath("$.sykmelding.medisinskVurdering.hovedDiagnose.tekst")
+                    .value("Muskel-/skjelettlidelse")
+            )
+            .andExpect(jsonPath("$.sykmelding.aktivitet[0].fom").value("2024-01-01"))
+            .andExpect(jsonPath("$.sykmelding.aktivitet[0].tom").value("2024-01-07"))
     }
 
     @Test
-    fun `opprettManuellOppgave should serialize sykmelding as JSON`() {
-        // Given: A ManuellOppgave
-        val sykmeldingId = "test-sykmelding-5"
-        val manuellOppgave =
-            createTestManuellOppgave(sykmeldingId, ManuellOppgaveStatus.FERDIGSTILT)
+    fun `hentOppgave should include arbeidsgiver information`() {
+        // Given
+        val oppgaveId = "test-sykmelding-999"
+        val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 22222)
 
-        // When: Creating the oppgave
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
+        `when`(manuellOppgaveService.hentOppgave(oppgaveId))
+            .thenReturn(Result.success(expectedResponse))
 
-        // Then: Sykmelding should be retrievable and contain correct data
-        val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
-        assertNotNull(result)
-        assertNotNull(result!!.sykmelding)
-        assertEquals(sykmeldingId, result.sykmelding.id)
-        assertEquals("12345678910", result.sykmelding.pasient.fnr)
+        // When/Then
+        mockMvc
+            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.sykmelding.arbeidsgiver.navn").value("Test Arbeidsgiver AS"))
+            .andExpect(jsonPath("$.sykmelding.arbeidsgiver.yrkesbetegnelse").value("Kontoransatt"))
+            .andExpect(jsonPath("$.sykmelding.arbeidsgiver.stillingsprosent").value(100))
     }
 
-    @Test
-    fun `erManuellOppgaveOpprettet should return false when oppgave does not exist`() {
-        // When: Check for non-existent oppgave
-        val exists = oppgaveRepository.erManuellOppgaveOpprettet("non-existent-id")
-
-        // Then: Should return false
-        assertFalse(exists)
-    }
-
-    @Test
-    fun `erManuellOppgaveOpprettet should return true when oppgave exists`() {
-        // Given: Insert a manuell oppgave
-        val sykmeldingId = "test-sykmelding-2"
-        val manuellOppgave = createTestManuellOppgave(sykmeldingId, null, null)
-        oppgaveRepository.opprettManuellOppgave(manuellOppgave)
-
-        // When: Check if oppgave exists
-        val exists = oppgaveRepository.erManuellOppgaveOpprettet(sykmeldingId)
-
-        // Then: Should return true
-        assertTrue(exists)
-    }
-
-    private fun createTestManuellOppgave(
+    private fun createTestManuellOppgaveResponse(
         sykmeldingId: String,
-        status: ManuellOppgaveStatus?,
-        oppgaveId: Int? = 12345
-    ): ManuellOppgave {
+        oppgaveId: Int
+    ): ManuellOppgaveResponse {
         val sykmelding = createTestXmlSykmelding(sykmeldingId)
 
-        return ManuellOppgave(
-            sykmelding = sykmelding,
-            ferdigstilt = false,
+        return ManuellOppgaveResponse(
             oppgaveId = oppgaveId,
-            status = status,
-            statusTimestamp = LocalDateTime.now(),
+            sykmelding = sykmelding,
+            ident = "12345678910",
+            ferdigstilt = false,
+            mottattDato = sykmelding.metadata.mottattDato.toString(),
+            status = "APEN",
+            statusTimestamp = LocalDate.now(),
         )
     }
 

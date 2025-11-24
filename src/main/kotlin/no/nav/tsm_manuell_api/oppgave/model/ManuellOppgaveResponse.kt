@@ -3,8 +3,8 @@ package no.nav.tsm_manuell_api.oppgave.model
 import java.time.LocalDate
 import no.nav.tsm.sykmelding.input.core.model.Sykmelding
 
-data class ManuellOppgaveDTO(
-    val oppgaveid: Int?,
+data class ManuellOppgaveResponse(
+    val oppgaveId: Int,
     val sykmelding: Sykmelding,
     val ident: String,
     val ferdigstilt: Boolean,
