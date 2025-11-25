@@ -163,4 +163,18 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     fun hentUlosteOppgaver(): List<UlosteOppgave> {
         TODO("IMPLEMENT")
     }
+
+    fun finnIdent(oppgaveId: Int): String? {
+        val sql =
+            """
+                SELECT pasientIdent FROM manuelloppgave
+                WHERE oppgaveid = :oppgaveId
+            """
+                .trimIndent()
+        val params = mapOf("oppgaveId" to oppgaveId)
+
+        return namedParameterJdbcTemplate
+            .query(sql, params) { rs, _ -> rs.getString("pasientIdent") }
+            .firstOrNull()
+    }
 }

@@ -84,3 +84,6 @@ services:
   tsm:
     pdlcache:
       url: ${TSM_PDL_ENDPOINT_URL}
+  teamsykefravr:
+    istilgangskontroll:
+      url: ${TEAMSYKEFRAVR_ISTILGANGSKONTROLL_URL}

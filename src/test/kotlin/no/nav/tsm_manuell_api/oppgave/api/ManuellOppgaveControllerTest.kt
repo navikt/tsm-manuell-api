@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import no.nav.tsm.sykmelding.input.core.model.*
 import no.nav.tsm.sykmelding.input.core.model.Pasient
 import no.nav.tsm.sykmelding.input.core.model.metadata.*
-import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
+import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -67,7 +67,10 @@ class ManuellOppgaveControllerTest {
 
         // When/Then
         mockMvc
-            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .perform(
+                get("/api/oppgave/{oppgaveId}", oppgaveId)
+                    .header("Authorization", "Bearer test-token")
+            )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.oppgaveId").value(expectedOppgaveId))
@@ -89,7 +92,12 @@ class ManuellOppgaveControllerTest {
             .thenReturn(Result.failure(Exception("Fant ikke oppgave med id $oppgaveId")))
 
         // When/Then
-        mockMvc.perform(get("/api/oppgave/{oppgaveId}", oppgaveId)).andExpect(status().isNotFound)
+        mockMvc
+            .perform(
+                get("/api/oppgave/{oppgaveId}", oppgaveId)
+                    .header("Authorization", "Bearer test-token")
+            )
+            .andExpect(status().isNotFound)
     }
 
     @Test
@@ -103,7 +111,10 @@ class ManuellOppgaveControllerTest {
 
         // When/Then
         mockMvc
-            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .perform(
+                get("/api/oppgave/{oppgaveId}", oppgaveId)
+                    .header("Authorization", "Bearer test-token")
+            )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.mottattDato").exists())
             .andExpect(jsonPath("$.mottattDato").isString)
@@ -120,7 +131,10 @@ class ManuellOppgaveControllerTest {
 
         // When/Then
         mockMvc
-            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .perform(
+                get("/api/oppgave/{oppgaveId}", oppgaveId)
+                    .header("Authorization", "Bearer test-token")
+            )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.sykmelding.medisinskVurdering.hovedDiagnose.kode").value("L87"))
             .andExpect(
@@ -142,7 +156,10 @@ class ManuellOppgaveControllerTest {
 
         // When/Then
         mockMvc
-            .perform(get("/api/oppgave/{oppgaveId}", oppgaveId))
+            .perform(
+                get("/api/oppgave/{oppgaveId}", oppgaveId)
+                    .header("Authorization", "Bearer test-token")
+            )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.sykmelding.arbeidsgiver.navn").value("Test Arbeidsgiver AS"))
             .andExpect(jsonPath("$.sykmelding.arbeidsgiver.yrkesbetegnelse").value("Kontoransatt"))

@@ -10,6 +10,7 @@ val javaVersion = JvmTarget.JVM_21
 
 val ktfmtVersion = "0.44"
 val sykmeldingInputVersion = "16"
+val caffeineVersion = "3.2.3"
 
 plugins {
 	kotlin("jvm") version "2.2.21"
@@ -42,6 +43,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("no.nav.tsm.sykmelding", "input", sykmeldingInputVersion)
+    implementation("com.github.ben-manes.caffeine:caffeine:${caffeineVersion}")
 
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")

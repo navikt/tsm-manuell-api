@@ -1,4 +1,4 @@
-package no.nav.tsm_manuell_api.oppgave
+package no.nav.tsm_manuell_api.oppgave.service
 
 import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
