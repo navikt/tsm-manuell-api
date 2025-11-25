@@ -6,6 +6,7 @@ import no.nav.tsm.sykmelding.input.core.model.RuleType
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.tsm_manuell_api.metrics.MESSAGE_STORED_IN_DB_COUNTER
+import no.nav.tsm_manuell_api.metrics.SYKMELDING_COUNT_STATUS
 import no.nav.tsm_manuell_api.oppgave.GosysOppgaveService
 import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
 import no.nav.tsm_manuell_api.person.Person
@@ -29,26 +30,30 @@ class MottattSykmeldingService(
         sykmeldingRecordValue: ByteArray?,
         metadata: Map<String, ByteArray>
     ) {
+
         if (sykmeldingRecordValue != null) {
             val sykmeldingRecord: SykmeldingRecord = objectMapper.readValue(sykmeldingRecordValue)
 
             val validationRules = sykmeldingRecord.validation.rules
-            if (containsPending(validationRules) && !containsOk(validationRules)) {
-                //            val person = finnAktorId(sykmeldingRecord) ?: return
+            val latestStatus = sykmeldingRecord.validation.status
+
+            if (latestStatus == RuleType.PENDING) {
+                // val person = finnAktorId(sykmeldingRecord) ?: return
                 handleOpprettManuellOppgave(sykmeldingRecord, metadata, null)
-            } else if (containsOk(validationRules)) {
+                SYKMELDING_COUNT_STATUS.labels(latestStatus.name.lowercase()).inc()
+            } else if (containsPending(validationRules)) {
                 logger.info(
-                    "Sykmelding med id: $sykmeldingId inneholder nå RuleType.OK, er dermed behandlet manuelt tidligere. Sletter eventuell manuell oppgave."
+                    "Sykmelding med id: $sykmeldingId har nå status $latestStatus, er dermed behandlet manuelt tidligere. Sletter eventuell manuell oppgave."
                 )
+                SYKMELDING_COUNT_STATUS.labels("pending_${latestStatus.name.lowercase()}").inc()
                 manuellOppgaveService.slettOppgave(sykmeldingId)
             } else {
-                logger.warn(
-                    "Sykmelding med id: $sykmeldingId inneholder ikke RuleType.PENDING eller inneholder RuleType.OK, hopper over manuell behandling"
-                )
+                SYKMELDING_COUNT_STATUS.labels(latestStatus.name.lowercase()).inc()
             }
         } else {
             logger.info("Mottatt tombstone for sykmelding med id $sykmeldingId")
             manuellOppgaveService.slettOppgave(sykmeldingId)
+            SYKMELDING_COUNT_STATUS.labels("deleted").inc()
         }
     }
 
