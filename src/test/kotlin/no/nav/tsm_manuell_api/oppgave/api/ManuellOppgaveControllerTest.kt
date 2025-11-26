@@ -5,8 +5,9 @@ import java.time.OffsetDateTime
 import no.nav.tsm.sykmelding.input.core.model.*
 import no.nav.tsm.sykmelding.input.core.model.Pasient
 import no.nav.tsm.sykmelding.input.core.model.metadata.*
-import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
+import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
+import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,6 +56,8 @@ class ManuellOppgaveControllerTest {
 
     @MockitoBean private lateinit var manuellOppgaveService: ManuellOppgaveService
 
+    @MockitoBean private lateinit var authorizationService: AuthorizationService
+
     @Test
     fun `hentOppgave should return 200 OK with ManuellOppgaveResponse when oppgave exists`() {
         // Given
@@ -62,6 +65,7 @@ class ManuellOppgaveControllerTest {
         val expectedOppgaveId = 12345
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, expectedOppgaveId)
 
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
 
@@ -88,6 +92,7 @@ class ManuellOppgaveControllerTest {
         // Given
         val oppgaveId = "non-existent-oppgave"
 
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.failure(Exception("Fant ikke oppgave med id $oppgaveId")))
 
@@ -106,6 +111,7 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-456"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 67890)
 
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
 
@@ -126,6 +132,7 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-789"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 11111)
 
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
 
@@ -151,6 +158,7 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-999"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 22222)
 
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
 

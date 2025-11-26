@@ -104,5 +104,4 @@ class MottattSykmeldingService(
     }
 
     fun containsPending(rules: List<Rule>): Boolean = rules.any { it.type == RuleType.PENDING }
-
 }

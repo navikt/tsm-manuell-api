@@ -6,26 +6,26 @@ import org.springframework.stereotype.Service
 
 @Service
 class AuthorizationService(
-    private val istilgangskontrollClient: IstilgangskontrollClient,
+    private val istilgangskontrollClient: IIstilgangskontrollClient,
     private val oppgaveRepository: OppgaveRepository,
 ) {
     val logger = logger()
 
     fun hasAccess(oppgaveId: String, accessToken: String): Boolean {
 
-        val ident = oppgaveRepository.finnIdent(oppgaveId.toInt())
-        if(ident == null) {
-            logger.info("did not find oppgave with id: $oppgaveId")
+        val id = oppgaveId.toIntOrNull() ?: return false
+        val ident = oppgaveRepository.finnIdent(id)
+        if (ident == null) {
+            logger.info("did not find oppgave with oppgaveId: $id")
             return false
         }
-        val tilgang = istilgangskontrollClient.sjekkVeiledersTilgang(accessToken = accessToken, ident = ident)
-            .getOrElse {
-                logger.info("Failed to check access for oppgave with id: $oppgaveId")
-                return false
-            }
+        val tilgang =
+            istilgangskontrollClient
+                .sjekkVeiledersTilgang(accessToken = accessToken, ident = ident)
+                .getOrElse {
+                    logger.info("Failed to check access for oppgave with oppgaveId: $id")
+                    return false
+                }
         return tilgang.erGodkjent
-
     }
-
-
 }

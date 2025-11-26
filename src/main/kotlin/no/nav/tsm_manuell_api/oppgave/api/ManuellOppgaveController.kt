@@ -1,7 +1,7 @@
 package no.nav.tsm_manuell_api.oppgave.api
 
-import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
+import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.http.ResponseEntity
@@ -27,14 +27,13 @@ class ManuellOppgaveController(
         val accessToken = authorization.removePrefix("Bearer ")
         val hasAccess = authorizationService.hasAccess(oppgaveId, accessToken)
 
-        if(hasAccess) {
+        if (hasAccess) {
             val manuellOppgaveResponse =
                 manuellOppgaveService.hentOppgave(oppgaveId).getOrElse {
                     return ResponseEntity.notFound().build()
                 }
             return ResponseEntity.ok(manuellOppgaveResponse)
-        }
-        else {
+        } else {
             logger.info("Bruker har ikke tilgang til oppgave med id $oppgaveId")
             return ResponseEntity.status(403).build()
         }

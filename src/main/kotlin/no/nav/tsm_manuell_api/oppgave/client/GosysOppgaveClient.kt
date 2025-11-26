@@ -56,5 +56,4 @@ class GosysOppgaveClient(
     }
 
     private fun getToken(): TexasClient.TokenResponse = texasClient.requestToken("fss", "oppgave")
-
 }
