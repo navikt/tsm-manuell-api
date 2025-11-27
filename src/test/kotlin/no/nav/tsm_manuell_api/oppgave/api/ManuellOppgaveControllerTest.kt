@@ -8,6 +8,7 @@ import no.nav.tsm.sykmelding.input.core.model.metadata.*
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
+import no.nav.tsm_manuell_api.utils.AccessLoggerUtils
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,6 +59,8 @@ class ManuellOppgaveControllerTest {
 
     @MockitoBean private lateinit var authorizationService: AuthorizationService
 
+    @MockitoBean private lateinit var accessLoggerUtils: AccessLoggerUtils
+
     @Test
     fun `hentOppgave should return 200 OK with ManuellOppgaveResponse when oppgave exists`() {
         // Given
@@ -68,6 +71,16 @@ class ManuellOppgaveControllerTest {
         `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
+        `when`(
+                accessLoggerUtils.createcCefMessage(
+                    fnr = expectedResponse.ident,
+                    accessToken = "test-token",
+                    operation = AccessLoggerUtils.Operation.READ,
+                    requestPath = "/api/oppgave/{oppgaveId}",
+                    permit = AccessLoggerUtils.Permit.PERMIT
+                )
+            )
+            .thenReturn("CEF message")
 
         // When/Then
         mockMvc
@@ -114,6 +127,16 @@ class ManuellOppgaveControllerTest {
         `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
+        `when`(
+                accessLoggerUtils.createcCefMessage(
+                    fnr = expectedResponse.ident,
+                    accessToken = "test-token",
+                    operation = AccessLoggerUtils.Operation.READ,
+                    requestPath = "/api/oppgave/{oppgaveId}",
+                    permit = AccessLoggerUtils.Permit.PERMIT
+                )
+            )
+            .thenReturn("CEF message")
 
         // When/Then
         mockMvc
@@ -135,6 +158,16 @@ class ManuellOppgaveControllerTest {
         `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
+        `when`(
+                accessLoggerUtils.createcCefMessage(
+                    fnr = expectedResponse.ident,
+                    accessToken = "test-token",
+                    operation = AccessLoggerUtils.Operation.READ,
+                    requestPath = "/api/oppgave/{oppgaveId}",
+                    permit = AccessLoggerUtils.Permit.PERMIT
+                )
+            )
+            .thenReturn("CEF message")
 
         // When/Then
         mockMvc
@@ -161,6 +194,16 @@ class ManuellOppgaveControllerTest {
         `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
+        `when`(
+                accessLoggerUtils.createcCefMessage(
+                    fnr = expectedResponse.ident,
+                    accessToken = "test-token",
+                    operation = AccessLoggerUtils.Operation.READ,
+                    requestPath = "/api/oppgave/{oppgaveId}",
+                    permit = AccessLoggerUtils.Permit.PERMIT
+                )
+            )
+            .thenReturn("CEF message")
 
         // When/Then
         mockMvc
