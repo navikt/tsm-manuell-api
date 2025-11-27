@@ -26,7 +26,7 @@ class ManuellOppgaveController(
     ): ResponseEntity<ManuellOppgaveResponse> {
         val accessToken = authorization.removePrefix("Bearer ")
         val hasAccess = authorizationService.hasAccess(oppgaveId, accessToken)
-
+//TODO legge på audit og secure logging for happy og sad path som i SMMB
         if (hasAccess) {
             val manuellOppgaveResponse =
                 manuellOppgaveService.hentOppgave(oppgaveId).getOrElse {
