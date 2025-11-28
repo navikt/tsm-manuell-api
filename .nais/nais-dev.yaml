@@ -76,5 +76,3 @@ spec:
       value: http://syfosmmanuell-backend.teamsykmelding
     - name: TEAMSYKEFRAVR_ISTILGANGSKONTROLL_URL
       value: http://istilgangskontroll.teamsykefravr
-    - name: TEAMSYKEFRAVR_ISTILGANGSKONTROLL_SCOPE
-      value: ISTILGANGSKONTROLL_SCOPE
