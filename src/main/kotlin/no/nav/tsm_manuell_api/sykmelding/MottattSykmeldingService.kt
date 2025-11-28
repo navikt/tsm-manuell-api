@@ -7,8 +7,8 @@ import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.metrics.INCOMING_MESSAGE_COUNTER
 import no.nav.tsm_manuell_api.metrics.MESSAGE_STORED_IN_DB_COUNTER
 import no.nav.tsm_manuell_api.metrics.SYKMELDING_COUNT_STATUS
-import no.nav.tsm_manuell_api.oppgave.GosysOppgaveService
-import no.nav.tsm_manuell_api.oppgave.ManuellOppgaveService
+import no.nav.tsm_manuell_api.oppgave.service.GosysOppgaveService
+import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.person.Person
 import no.nav.tsm_manuell_api.person.PersonService
 import no.nav.tsm_manuell_api.utils.logger
@@ -104,6 +104,4 @@ class MottattSykmeldingService(
     }
 
     fun containsPending(rules: List<Rule>): Boolean = rules.any { it.type == RuleType.PENDING }
-
-    fun containsOk(rules: List<Rule>): Boolean = rules.any { it.type == RuleType.OK }
 }

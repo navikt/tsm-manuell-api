@@ -1,4 +1,4 @@
-package no.nav.tsm_manuell_api.oppgave
+package no.nav.tsm_manuell_api.oppgave.service
 
 import java.time.DayOfWeek
 import java.time.LocalDate

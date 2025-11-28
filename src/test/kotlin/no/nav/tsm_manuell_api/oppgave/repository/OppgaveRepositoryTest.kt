@@ -105,8 +105,9 @@ class OppgaveRepositoryTest {
 
         // Then: Oppgave should be created with null values
         val result = oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
+        requireNotNull(result)
         assertNotNull(result)
-        assertEquals(sykmeldingId, result!!.sykmelding.id)
+        assertEquals(sykmeldingId, result.sykmelding.id)
         assertEquals(null, result.status)
     }
 
