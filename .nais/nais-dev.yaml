@@ -27,6 +27,8 @@ spec:
         flags:
           - name: cloudsql.logical_decoding
             value: "on"
+          - name: cloudsql.enable_pgaudit
+            value: "true"
         pointInTimeRecovery: true
         tier: db-f1-micro
   image: {{ image }}
