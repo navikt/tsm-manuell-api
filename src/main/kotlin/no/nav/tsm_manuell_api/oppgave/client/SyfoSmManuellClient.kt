@@ -41,7 +41,7 @@ class SyfoSmManuellClient(
                 Result.failure(IllegalStateException("Response body was null"))
             }
         } catch (e: RestClientResponseException) {
-            logger.error("Feil ved henting av oppgaveId fra SMM: ${e.responseBodyAsString}", e)
+            logger.error("Feil ved henting av oppgaveId knytt til sykmeldingId ${sykmeldingId} fra SMM: ${e.responseBodyAsString}", e)
             Result.failure(e)
         }
     }
