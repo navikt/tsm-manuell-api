@@ -12,46 +12,30 @@ import no.nav.tsm_manuell_api.utils.AccessLoggerUtils
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.servlet.OAuth2ResourceServerAutoConfiguration
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@WebMvcTest(
+    controllers = [ManuellOppgaveController::class],
+    excludeAutoConfiguration =
+        [OAuth2ClientAutoConfiguration::class, OAuth2ResourceServerAutoConfiguration::class]
+)
+@TestPropertySource(
+    properties =
+        [
+            "spring.security.oauth2.client.registration.pdlcache-m2m.client-id=test",
+            "spring.security.oauth2.client.registration.pdlcache-m2m.client-secret=test",
+            "spring.security.oauth2.client.provider.aad.token-uri=http://localhost:8080/token"
+        ]
+)
 class ManuellOppgaveControllerTest {
-
-    companion object {
-        @Container
-        val postgres =
-            PostgreSQLContainer<Nothing>("postgres:16-alpine").apply {
-                withDatabaseName("testdb")
-                withUsername("test")
-                withPassword("test")
-            }
-
-        @JvmStatic
-        @DynamicPropertySource
-        fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("spring.datasource.url", postgres::getJdbcUrl)
-            registry.add("spring.datasource.username", postgres::getUsername)
-            registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.flyway.url", postgres::getJdbcUrl)
-            registry.add("spring.flyway.user", postgres::getUsername)
-            registry.add("spring.flyway.password", postgres::getPassword)
-        }
-    }
 
     @Autowired private lateinit var mockMvc: MockMvc
 
