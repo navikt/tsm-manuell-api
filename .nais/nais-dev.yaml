@@ -11,6 +11,9 @@ spec:
           namespace: teamsykmelding
         - application: logging
           namespace: nais-system
+    inbound:
+      rules:
+        - application: tsm-manuell
   gcp:
     sqlInstances:
       - type: POSTGRES_17

@@ -45,7 +45,8 @@ class ManuellOppgaveController(
     }
 
     // andre endepunkt som SMMB har
-    //    get("/oppgaver") { call.respond(manuellOppgaveService.getOppgaver()) }
+    //    get("/oppgaver") { call.respond(manuellOppgaveService.getOppgaver()) } - henter uløste oppgaver
+    // get hent oppgave/sykmelding/{sykmeldingId}
 
     private fun hasReadPermitLogMessage(ident: String, accessToken: String): String {
         val path = "/api/oppgave/{oppgaveId}"
