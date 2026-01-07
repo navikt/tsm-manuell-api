@@ -13,37 +13,17 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    url: "${DB_JDBC_URL}"
+    url: ${DB_JDBC_URL}
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     baseline-on-migrate: true
   datasource:
-    url: "${DB_JDBC_URL}"
+    url: ${DB_JDBC_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
       minimum-idle: 1
       maximum-pool-size: 5
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${AZURE_OPENID_CONFIG_ISSUER}
-          jwk-set-uri: ${AZURE_OPENID_CONFIG_JWKS_URI}
-          audiences: ${AZURE_APP_CLIENT_ID}
-      client:
-        provider:
-          aad:
-            issuer-uri: ${azure.openid.config.issuer}
-        registration:
-          pdlcache-m2m:
-            authorization-grant-type: client_credentials
-            client-authentication-method: client_secret_basic
-            client-id: ${azure.app.client.id}
-            client-secret: ${azure.app.client.secret}
-            provider: aad
-            scope:
-              - ${tsmpdl.scope}
   kafka:
     bootstrap-servers: ${kafka.brokers}
     security:

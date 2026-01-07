@@ -4,11 +4,33 @@ spring:
       - org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration
       - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  flyway:
+    url: ${DB_JDBC_URL:jdbc:postgresql://localhost:5432/tsm-manuell-db}
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  datasource:
+    url: ${DB_JDBC_URL:jdbc:postgresql://localhost:5432/tsm-manuell-db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   kafka:
     bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
     security:
       protocol: plaintext
 
 nais:
-  cluster: "cluster-test-name"
+  token_endpoint: ${NAIS_TOKEN_ENDPOINT:http://localhost:8080/token}
+  cluster: ${NAIS_CLUSTER_NAME:local}
+
+services:
+  gosys:
+    oppgave:
+      url: ${GOSYS_OPPGAVE_URL:http://localhost:8081}
+  syfosmmanuell:
+    url: ${SYFOSMMANUELL_URL:http://localhost:8082}
+  tsm:
+    pdlcache:
+      url: ${TSM_PDL_ENDPOINT_URL:http://localhost:8083}
+  teamsykefravr:
+    istilgangskontroll:
+      url: ${TEAMSYKEFRAVR_ISTILGANGSKONTROLL_URL:http://localhost:8084}
 

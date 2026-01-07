@@ -50,9 +50,9 @@ class AccessLoggerUtils {
     fun logNAVEpostFromTokenToTeamLogsWhenNoAccess(accessToken: String, path: String) {
         try {
             val navEmail = getNavEpostFromToken(accessToken)
-            teamLogger.info("Logger ut navEpost: {}, har ikke tilgang til path: {}", navEmail, path)
+            teamLogger.info("Logger ut navEpost: {}, har ikkje tilgong til path: {}", navEmail, path)
         } catch (exception: Exception) {
-            teamLogger.info("Fikk ikkje hentet ut navEpost", exception)
+            teamLogger.info("Fekk ikkje henta ut navEpost", exception)
         }
     }
 

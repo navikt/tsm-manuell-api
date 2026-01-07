@@ -1,6 +1,9 @@
 package no.nav.tsm_manuell_api.security.authentication
 
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
+import no.nav.tsm_manuell_api.utils.AuditLoggingService
+import no.nav.tsm_manuell_api.utils.IAuditLoggingService
+import no.nav.tsm_manuell_api.utils.auditLogger
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
 
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Service
 class AuthorizationService(
     private val istilgangskontrollClient: IIstilgangskontrollClient,
     private val oppgaveRepository: OppgaveRepository,
+    private val auditLoggingService: IAuditLoggingService
 ) {
     val logger = logger()
 
@@ -16,16 +20,18 @@ class AuthorizationService(
         val id = oppgaveId.toIntOrNull() ?: return false
         val ident = oppgaveRepository.finnIdent(id)
         if (ident == null) {
-            logger.info("did not find oppgave with oppgaveId: $id")
+            logger.info("Fant ikkje oppgåve med oppgaveId: $id")
             return false
         }
         val tilgang =
             istilgangskontrollClient
                 .sjekkVeiledersTilgang(accessToken = accessToken, ident = ident)
                 .getOrElse {
-                    logger.info("Failed to check access for oppgave with oppgaveId: $id")
+                    logger.info("Feila tilgangssjekk for oppgåve --- oppgaveId: $id")
+                    auditLoggingService.missingReadPermitLogMessage(accessToken)
                     return false
                 }
+        auditLoggingService.hasReadPermitLogMessage(ident, accessToken)
         return tilgang.erGodkjent
     }
 }

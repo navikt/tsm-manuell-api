@@ -15,7 +15,7 @@ interface IIstilgangskontrollClient {
     fun sjekkVeiledersTilgang(accessToken: String, ident: String): Result<Tilgang>
 }
 
-@Profile("!local & !test")
+@Profile("!local && !test")
 @Component
 class IstilgangskontrollClient(
     restClientBuilder: RestClient.Builder,
