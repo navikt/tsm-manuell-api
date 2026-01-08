@@ -16,7 +16,6 @@ class AuthorizationService(
     val logger = logger()
 
     fun hasAccess(oppgaveId: String, accessToken: String): Boolean {
-
         val id = oppgaveId.toIntOrNull() ?: return false
         val ident = oppgaveRepository.finnIdent(id)
         if (ident == null) {
