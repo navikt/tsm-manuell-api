@@ -72,8 +72,6 @@ spec:
       tenant: nav.no
   kafka:
     pool: nav-prod
-  secureLogs:
-    enabled: true
   env:
     - name: GOSYS_OPPGAVE_URL
       value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
