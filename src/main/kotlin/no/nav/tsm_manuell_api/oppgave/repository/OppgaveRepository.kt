@@ -2,11 +2,13 @@ package no.nav.tsm_manuell_api.oppgave.repository
 
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
 import no.nav.tsm_manuell_api.oppgave.model.UlosteOppgave
 import no.nav.tsm_manuell_api.utils.objectMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Repository
 @Transactional
@@ -189,7 +191,21 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
     }
 
     fun hentUlosteOppgaver(): List<UlosteOppgave> {
-        TODO("IMPLEMENT")
+        val sql =
+            """
+                SELECT (sykmelding->'metadata'->>'mottattDato')::timestamp as dato, oppgaveId, status FROM MANUELLOPPGAVE
+                                WHERE ferdigstilt is not true
+                
+            """.trimIndent()
+
+        return namedParameterJdbcTemplate
+            .query(sql) { rs, _ ->
+                UlosteOppgave(
+                    mottattDato = rs.getTimestamp("dato")?.toLocalDateTime(),
+                    oppgaveId = rs.getInt("oppgaveId"),
+                    status = rs.getString("status")?.toManuellOppgaveStatus(),
+                )
+            }
     }
 
     fun finnIdent(oppgaveId: Int): String? {
@@ -205,4 +221,8 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
             .query(sql, params) { rs, _ -> rs.getString("pasientIdent") }
             .firstOrNull()
     }
+}
+
+private fun String?.toManuellOppgaveStatus(): ManuellOppgaveStatus? {
+    return this?.let { ManuellOppgaveStatus.valueOf(it) }
 }

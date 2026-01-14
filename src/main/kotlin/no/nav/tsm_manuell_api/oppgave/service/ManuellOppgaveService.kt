@@ -1,15 +1,12 @@
 package no.nav.tsm_manuell_api.oppgave.service
 
-import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.oppgave.client.ISyfoSmManuellClient
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgave
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveDTO
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
-import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveStatus
+import no.nav.tsm_manuell_api.oppgave.model.*
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class ManuellOppgaveService(
@@ -80,6 +77,13 @@ class ManuellOppgaveService(
             statusTimestamp = dto.statusTimestamp,
         )
     }
+
+    fun hentUlosteOppgaver(): List<UlosteOppgave> {
+        val ulosteOppgaver = oppgaveRepository.hentUlosteOppgaver()
+
+        return ulosteOppgaver
+    }
+
     //    fun lagreManuellOppgave(
     //        sykmeldingRecord: SykmeldingRecord,
     //        gosysOppgave: GosysOpprettOppgaveResponse

@@ -1,6 +1,7 @@
 package no.nav.tsm_manuell_api.oppgave.api
 
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
+import no.nav.tsm_manuell_api.oppgave.model.UlosteOppgave
 import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
 import no.nav.tsm_manuell_api.utils.AccessLoggerUtils
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/oppgave")
+@RequestMapping("/api")
 class ManuellOppgaveController(
     private val manuellOppgaveService: ManuellOppgaveService,
     private val authorizationService: AuthorizationService,
@@ -22,7 +23,7 @@ class ManuellOppgaveController(
     val logger = logger()
     val auditLogger = auditLogger()
 
-    @GetMapping("/{oppgaveId}")
+    @GetMapping("/oppgave/{oppgaveId}")
     fun hentOppgave(
         @PathVariable oppgaveId: String,
         @RequestHeader("Authorization") authorization: String
@@ -42,8 +43,13 @@ class ManuellOppgaveController(
         }
     }
 
+    @GetMapping("/oppgaver")
+    fun hentOppgaver(): ResponseEntity<List<UlosteOppgave>> {
+        logger.info("Henter oppgaver")
+        val oppgaver = manuellOppgaveService.hentUlosteOppgaver()
+        return ResponseEntity.ok(oppgaver)
+    }
+
     // andre endepunkt som SMMB har
-    //    get("/oppgaver") { call.respond(manuellOppgaveService.getOppgaver()) } - henter uløste
-    // oppgaver
     // get hent oppgave/sykmelding/{sykmeldingId}
 }
