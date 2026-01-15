@@ -67,6 +67,7 @@ spec:
     application:
       enabled: true
       tenant: trygdeetaten.no
+      allowAllUsers: true
   kafka:
     pool: nav-dev
   env:
