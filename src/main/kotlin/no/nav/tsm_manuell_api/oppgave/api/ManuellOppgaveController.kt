@@ -45,7 +45,6 @@ class ManuellOppgaveController(
 
     @GetMapping("/oppgaver")
     fun hentOppgaver(): ResponseEntity<List<UlosteOppgave>> {
-        logger.info("Henter oppgaver")
         val oppgaver = manuellOppgaveService.hentUlosteOppgaver()
         return ResponseEntity.ok(oppgaver)
     }
