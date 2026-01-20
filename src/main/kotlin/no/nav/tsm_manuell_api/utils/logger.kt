@@ -15,7 +15,7 @@ inline fun <reified T> T.auditLogger(): Logger =
     LoggerFactory.getLogger("auditLogger.${T::class.java.name}")
 
 @Component
-class AccessLoggerUtils {
+class LoggerUtils {
     val teamLogger = teamLogger()
 
     fun createcCefMessage(
@@ -50,7 +50,11 @@ class AccessLoggerUtils {
     fun logNAVEpostFromTokenToTeamLogsWhenNoAccess(accessToken: String, path: String) {
         try {
             val navEmail = getNavEpostFromToken(accessToken)
-            teamLogger.info("Logger ut navEpost: {}, har ikkje tilgong til path: {}", navEmail, path)
+            teamLogger.info(
+                "Logger ut navEpost: {}, har ikkje tilgong til path: {}",
+                navEmail,
+                path
+            )
         } catch (exception: Exception) {
             teamLogger.info("Fekk ikkje henta ut navEpost", exception)
         }

@@ -1,11 +1,10 @@
 package no.nav.tsm_manuell_api.oppgave.api
 
+import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveIds
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.model.UlosteOppgave
 import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
-import no.nav.tsm_manuell_api.utils.AccessLoggerUtils
-import no.nav.tsm_manuell_api.utils.auditLogger
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,7 +20,6 @@ class ManuellOppgaveController(
     private val authorizationService: AuthorizationService,
 ) {
     val logger = logger()
-    val auditLogger = auditLogger()
 
     @GetMapping("/oppgave/{oppgaveId}")
     fun hentOppgave(
@@ -30,7 +28,8 @@ class ManuellOppgaveController(
     ): ResponseEntity<ManuellOppgaveResponse> {
         val accessToken = authorization.removePrefix("Bearer ")
 
-        val hasAccess = authorizationService.hasAccess(oppgaveId, accessToken)
+        val hasAccess =
+            authorizationService.hasAccess(oppgaveId, accessToken, "/api/oppgave/$oppgaveId")
         if (hasAccess) {
             val manuellOppgaveResponse =
                 manuellOppgaveService.hentOppgave(oppgaveId).getOrElse {
@@ -38,7 +37,9 @@ class ManuellOppgaveController(
                 }
             return ResponseEntity.ok(manuellOppgaveResponse)
         } else {
-            logger.info("Brukar har ikkje tilgong til oppgåva eller oppgåva finst ikkje --- oppgaveId: $oppgaveId")
+            logger.info(
+                "Brukar har ikkje tilgong til oppgåva eller oppgåva finst ikkje --- oppgaveId: $oppgaveId"
+            )
             return ResponseEntity.status(403).build()
         }
     }
@@ -49,6 +50,14 @@ class ManuellOppgaveController(
         return ResponseEntity.ok(oppgaver)
     }
 
-    // andre endepunkt som SMMB har
-    // get hent oppgave/sykmelding/{sykmeldingId}
+    @GetMapping("/oppgave/sykmelding/{sykmeldingId}")
+    fun hentOppgaveBySykmeldingId(
+        @PathVariable sykmeldingId: String,
+    ): ResponseEntity<ManuellOppgaveIds> {
+        val manuellOppgaveResponse =
+            manuellOppgaveService.hentOppgaveBySykmeldingId(sykmeldingId).getOrElse {
+                return ResponseEntity.notFound().build()
+            }
+        return ResponseEntity.ok(manuellOppgaveResponse)
+    }
 }

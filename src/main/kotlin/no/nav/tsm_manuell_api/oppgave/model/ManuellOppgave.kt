@@ -17,3 +17,5 @@ enum class ManuellOppgaveStatus {
     FEILREGISTRERT,
     DELETED,
 }
+
+data class ManuellOppgaveIds(val oppgaveId: Int, val sykmeldingId: String)

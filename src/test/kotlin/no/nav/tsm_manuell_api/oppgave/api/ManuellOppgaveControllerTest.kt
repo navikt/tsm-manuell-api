@@ -8,13 +8,14 @@ import no.nav.tsm.sykmelding.input.core.model.metadata.*
 import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
-import no.nav.tsm_manuell_api.utils.AccessLoggerUtils
+import no.nav.tsm_manuell_api.utils.LoggerUtils
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration
-import org.springframework.boot.security.oauth2.server.resource.autoconfigure.servlet.OAuth2ResourceServerAutoConfiguration
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
@@ -25,8 +26,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 @WebMvcTest(
     controllers = [ManuellOppgaveController::class],
     excludeAutoConfiguration =
-        [OAuth2ClientAutoConfiguration::class, OAuth2ResourceServerAutoConfiguration::class]
+        [SecurityAutoConfiguration::class, UserDetailsServiceAutoConfiguration::class]
 )
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(
     properties =
         [
@@ -43,7 +45,7 @@ class ManuellOppgaveControllerTest {
 
     @MockitoBean private lateinit var authorizationService: AuthorizationService
 
-    @MockitoBean private lateinit var accessLoggerUtils: AccessLoggerUtils
+    @MockitoBean private lateinit var loggerUtils: LoggerUtils
 
     @Test
     fun `hentOppgave should return 200 OK with ManuellOppgaveResponse when oppgave exists`() {
@@ -52,16 +54,16 @@ class ManuellOppgaveControllerTest {
         val expectedOppgaveId = 12345
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, expectedOppgaveId)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
-                accessLoggerUtils.createcCefMessage(
+                loggerUtils.createcCefMessage(
                     fnr = expectedResponse.ident,
                     accessToken = "test-token",
-                    operation = AccessLoggerUtils.Operation.READ,
+                    operation = LoggerUtils.Operation.READ,
                     requestPath = "/api/oppgave/{oppgaveId}",
-                    permit = AccessLoggerUtils.Permit.PERMIT
+                    permit = LoggerUtils.Permit.PERMIT
                 )
             )
             .thenReturn("CEF message")
@@ -89,7 +91,7 @@ class ManuellOppgaveControllerTest {
         // Given
         val oppgaveId = "non-existent-oppgave"
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.failure(Exception("Fant ikke oppgave med id $oppgaveId")))
 
@@ -108,16 +110,16 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-456"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 67890)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
-                accessLoggerUtils.createcCefMessage(
+                loggerUtils.createcCefMessage(
                     fnr = expectedResponse.ident,
                     accessToken = "test-token",
-                    operation = AccessLoggerUtils.Operation.READ,
+                    operation = LoggerUtils.Operation.READ,
                     requestPath = "/api/oppgave/{oppgaveId}",
-                    permit = AccessLoggerUtils.Permit.PERMIT
+                    permit = LoggerUtils.Permit.PERMIT
                 )
             )
             .thenReturn("CEF message")
@@ -139,16 +141,16 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-789"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 11111)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
-                accessLoggerUtils.createcCefMessage(
+                loggerUtils.createcCefMessage(
                     fnr = expectedResponse.ident,
                     accessToken = "test-token",
-                    operation = AccessLoggerUtils.Operation.READ,
+                    operation = LoggerUtils.Operation.READ,
                     requestPath = "/api/oppgave/{oppgaveId}",
-                    permit = AccessLoggerUtils.Permit.PERMIT
+                    permit = LoggerUtils.Permit.PERMIT
                 )
             )
             .thenReturn("CEF message")
@@ -175,16 +177,16 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-999"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 22222)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
-                accessLoggerUtils.createcCefMessage(
+                loggerUtils.createcCefMessage(
                     fnr = expectedResponse.ident,
                     accessToken = "test-token",
-                    operation = AccessLoggerUtils.Operation.READ,
+                    operation = LoggerUtils.Operation.READ,
                     requestPath = "/api/oppgave/{oppgaveId}",
-                    permit = AccessLoggerUtils.Permit.PERMIT
+                    permit = LoggerUtils.Permit.PERMIT
                 )
             )
             .thenReturn("CEF message")

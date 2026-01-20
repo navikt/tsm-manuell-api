@@ -1,12 +1,12 @@
 package no.nav.tsm_manuell_api.oppgave.service
 
+import java.time.LocalDateTime
 import no.nav.tsm.sykmelding.input.core.model.SykmeldingRecord
 import no.nav.tsm_manuell_api.oppgave.client.ISyfoSmManuellClient
 import no.nav.tsm_manuell_api.oppgave.model.*
 import no.nav.tsm_manuell_api.oppgave.repository.OppgaveRepository
 import no.nav.tsm_manuell_api.utils.logger
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class ManuellOppgaveService(
@@ -82,6 +82,40 @@ class ManuellOppgaveService(
         val ulosteOppgaver = oppgaveRepository.hentUlosteOppgaver()
 
         return ulosteOppgaver
+    }
+
+    fun hentOppgaveBySykmeldingId(sykmeldingId: String): Result<ManuellOppgaveIds> {
+        val dto =
+            oppgaveRepository.hentManuellOppgaveForSykmeldingId(sykmeldingId)
+                ?: return Result.failure(
+                    Exception("Fant ingen oppgåver med sykmeldingId $sykmeldingId")
+                )
+        val res = mapTomanuellOppgaveIdsResponse(dto)
+        return Result.success(res)
+    }
+
+    private fun mapTomanuellOppgaveIdsResponse(dto: ManuellOppgaveDTO): ManuellOppgaveIds {
+        val oppgaveId = dto.oppgaveid
+        requireNotNull(oppgaveId)
+
+        return ManuellOppgaveIds(
+            oppgaveId = oppgaveId,
+            sykmeldingId = dto.sykmelding.id,
+        )
+    }
+
+    fun finnesOppgave(oppgaveId: String): Boolean {
+        return oppgaveRepository.finnesOppgave(oppgaveId)
+    }
+
+    fun ferdigstillManuellBehandling(
+        oppgaveId: String,
+        navEining: String,
+        rettleiar: String,
+        accessToken: String,
+        merknadar: List<Merknad>?
+    ) {
+        TODO("IMPLEMENT")
     }
 
     //    fun lagreManuellOppgave(

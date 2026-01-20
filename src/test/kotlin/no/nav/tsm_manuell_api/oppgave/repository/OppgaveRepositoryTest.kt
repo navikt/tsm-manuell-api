@@ -158,11 +158,13 @@ class OppgaveRepositoryTest {
     @Test
     fun `hentUlosteOppgaver should only return unsolved oppgaver`() {
         // Given: One solved (ferdigstilt) and one unsolved oppgave
-        val solvedOppgave = createTestManuellOppgave("solved-sykmelding", ManuellOppgaveStatus.FERDIGSTILT, 11111)
+        val solvedOppgave =
+            createTestManuellOppgave("solved-sykmelding", ManuellOppgaveStatus.FERDIGSTILT, 11111)
         val solvedOppgaveMarkedComplete = solvedOppgave.copy(ferdigstilt = true)
         oppgaveRepository.opprettManuellOppgave(solvedOppgaveMarkedComplete)
-        
-        val unsolvedOppgave = createTestManuellOppgave("unsolved-sykmelding", ManuellOppgaveStatus.APEN, 22222)
+
+        val unsolvedOppgave =
+            createTestManuellOppgave("unsolved-sykmelding", ManuellOppgaveStatus.APEN, 22222)
         oppgaveRepository.opprettManuellOppgave(unsolvedOppgave)
 
         // When: Retrieving uloste oppgaver

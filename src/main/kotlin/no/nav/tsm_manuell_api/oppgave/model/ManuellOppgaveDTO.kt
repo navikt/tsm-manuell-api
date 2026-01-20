@@ -12,3 +12,5 @@ data class ManuellOppgaveDTO(
     val status: String?,
     val statusTimestamp: LocalDate?,
 )
+
+data class ManuellOppgaveIdsDTO(val oppgaveId: Int, val sykmeldingId: String)

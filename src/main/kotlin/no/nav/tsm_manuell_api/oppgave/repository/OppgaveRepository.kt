@@ -8,7 +8,6 @@ import no.nav.tsm_manuell_api.utils.objectMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Repository
 @Transactional
@@ -137,8 +136,20 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
         TODO("IMPLEMENT")
     }
 
-    fun finnesOppgave(sykmeldingId: String): Boolean {
-        TODO("IMPLEMENT")
+    fun finnesOppgave(oppgaveId: String): Boolean {
+        val sql =
+            """
+                SELECT true
+                FROM MANUELLOPPGAVE
+                WHERE oppgaveid=?;
+            """
+                .trimIndent()
+        return namedParameterJdbcTemplate.queryForObject(
+            sql,
+            mapOf("oppgaveId" to oppgaveId),
+            Boolean::class.java
+        )
+            ?: false
     }
 
     fun finnesSykmelding(sykmeldingId: String): Boolean {
@@ -196,16 +207,16 @@ class OppgaveRepository(private val namedParameterJdbcTemplate: NamedParameterJd
                 SELECT (sykmelding->'metadata'->>'mottattDato')::timestamp as dato, oppgaveId, status FROM MANUELLOPPGAVE
                                 WHERE ferdigstilt is not true
                 
-            """.trimIndent()
+            """
+                .trimIndent()
 
-        return namedParameterJdbcTemplate
-            .query(sql) { rs, _ ->
-                UlosteOppgave(
-                    mottattDato = rs.getTimestamp("dato")?.toLocalDateTime(),
-                    oppgaveId = rs.getInt("oppgaveId"),
-                    status = rs.getString("status")?.toManuellOppgaveStatus(),
-                )
-            }
+        return namedParameterJdbcTemplate.query(sql) { rs, _ ->
+            UlosteOppgave(
+                mottattDato = rs.getTimestamp("dato")?.toLocalDateTime(),
+                oppgaveId = rs.getInt("oppgaveId"),
+                status = rs.getString("status")?.toManuellOppgaveStatus(),
+            )
+        }
     }
 
     fun finnIdent(oppgaveId: Int): String? {
