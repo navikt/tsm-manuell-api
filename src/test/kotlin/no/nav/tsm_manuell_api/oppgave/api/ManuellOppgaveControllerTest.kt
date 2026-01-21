@@ -9,43 +9,80 @@ import no.nav.tsm_manuell_api.oppgave.model.ManuellOppgaveResponse
 import no.nav.tsm_manuell_api.oppgave.service.ManuellOppgaveService
 import no.nav.tsm_manuell_api.security.authentication.AuthorizationService
 import no.nav.tsm_manuell_api.utils.LoggerUtils
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 
-@WebMvcTest(
-    controllers = [ManuellOppgaveController::class],
-    excludeAutoConfiguration =
-        [SecurityAutoConfiguration::class, UserDetailsServiceAutoConfiguration::class]
-)
-@AutoConfigureMockMvc(addFilters = false)
-@TestPropertySource(
+@Testcontainers
+@SpringBootTest(
     properties =
         [
-            "spring.security.oauth2.client.registration.pdlcache-m2m.client-id=test",
-            "spring.security.oauth2.client.registration.pdlcache-m2m.client-secret=test",
-            "spring.security.oauth2.client.provider.aad.token-uri=http://localhost:8080/token"
+            "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration"
         ]
 )
+@ActiveProfiles("test")
 class ManuellOppgaveControllerTest {
 
-    @Autowired private lateinit var mockMvc: MockMvc
+    companion object {
+        @Container
+        val postgres =
+            PostgreSQLContainer<Nothing>("postgres:16-alpine").apply {
+                withDatabaseName("testdb")
+                withUsername("test")
+                withPassword("test")
+            }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgres::getJdbcUrl)
+            registry.add("spring.datasource.username", postgres::getUsername)
+            registry.add("spring.datasource.password", postgres::getPassword)
+            registry.add("spring.kafka.bootstrap-servers") { "localhost:9092" }
+        }
+    }
+
+    @Autowired private lateinit var webApplicationContext: WebApplicationContext
+
+    @Autowired(required = false)
+    private var springSecurityFilterChain: org.springframework.security.web.FilterChainProxy? = null
+
+    private lateinit var mockMvc: MockMvc
 
     @MockitoBean private lateinit var manuellOppgaveService: ManuellOppgaveService
 
     @MockitoBean private lateinit var authorizationService: AuthorizationService
 
     @MockitoBean private lateinit var loggerUtils: LoggerUtils
+
+    @BeforeEach
+    fun setup() {
+        mockMvc =
+            if (springSecurityFilterChain != null) {
+                MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                    .addFilters<org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder>(
+                        springSecurityFilterChain!!
+                    )
+                    .build()
+            } else {
+                MockMvcBuilders.webAppContextSetup(webApplicationContext).build()
+            }
+    }
 
     @Test
     fun `hentOppgave should return 200 OK with ManuellOppgaveResponse when oppgave exists`() {
@@ -54,7 +91,8 @@ class ManuellOppgaveControllerTest {
         val expectedOppgaveId = 12345
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, expectedOppgaveId)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "/api/oppgave/$oppgaveId"))
+            .thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
@@ -91,7 +129,8 @@ class ManuellOppgaveControllerTest {
         // Given
         val oppgaveId = "non-existent-oppgave"
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "/api/oppgave/$oppgaveId"))
+            .thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.failure(Exception("Fant ikke oppgave med id $oppgaveId")))
 
@@ -110,7 +149,8 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-456"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 67890)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "/api/oppgave/$oppgaveId"))
+            .thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
@@ -141,7 +181,8 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-789"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 11111)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "/api/oppgave/$oppgaveId"))
+            .thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
@@ -177,7 +218,8 @@ class ManuellOppgaveControllerTest {
         val oppgaveId = "test-sykmelding-999"
         val expectedResponse = createTestManuellOppgaveResponse(oppgaveId, 22222)
 
-        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "path")).thenReturn(true)
+        `when`(authorizationService.hasAccess(oppgaveId, "test-token", "/api/oppgave/$oppgaveId"))
+            .thenReturn(true)
         `when`(manuellOppgaveService.hentOppgave(oppgaveId))
             .thenReturn(Result.success(expectedResponse))
         `when`(
