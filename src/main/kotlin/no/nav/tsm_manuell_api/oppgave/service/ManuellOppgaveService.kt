@@ -113,7 +113,6 @@ class ManuellOppgaveService(
         navEining: String,
         rettleiar: String,
         accessToken: String,
-        merknadar: List<Merknad>?
     ) {
         TODO("IMPLEMENT")
     }

@@ -48,13 +48,12 @@ class SendManuellVurderingController(
                 "/api/vurderingmanuelloppgave/$oppgaveId"
             )
 
-        if (navEining.isNullOrEmpty()) {
+        if (navEining.isEmpty()) {
             logger.error("Manglar X-Nav-Enhet i header")
             return ResponseEntity.badRequest().build()
         }
         when (hasAccess) {
             true -> {
-                val merknad = saksbehandlersVurdering.toMerknad()
 
                 val rettleiar = authorizationService.hentRettleiarIdent(oppgaveId)
                 teamLogger.info(
@@ -65,7 +64,6 @@ class SendManuellVurderingController(
                     navEining = navEining,
                     rettleiar = rettleiar,
                     accessToken = accessToken,
-                    merknadar = merknad?.let { listOf(it) },
                 )
 
                 auditLogger.info("Ferdigstilt manuell oppgave for oppgave: $oppgaveId")
