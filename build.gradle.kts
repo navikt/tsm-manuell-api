@@ -13,9 +13,9 @@ val sykmeldingInputVersion = "16"
 val caffeineVersion = "3.2.3"
 
 plugins {
-	kotlin("jvm") version "2.2.21"
-	kotlin("plugin.spring") version "2.2.21"
-	id("org.springframework.boot") version "4.0.0"
+	kotlin("jvm") version "2.3.0"
+	kotlin("plugin.spring") version "2.3.0"
+	id("org.springframework.boot") version "4.0.2"
 	id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.0.0"
 }
@@ -54,9 +54,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.kafka:spring-kafka-test")
-    testImplementation("org.testcontainers:testcontainers:1.21.3")
-    testImplementation("org.testcontainers:postgresql:1.21.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    testImplementation("org.testcontainers:testcontainers:2.0.3")
+    testImplementation("org.testcontainers:postgresql:2.0.3")
+    testImplementation("org.testcontainers:junit-jupiter:2.0.3")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     runtimeOnly("org.postgresql:postgresql")
