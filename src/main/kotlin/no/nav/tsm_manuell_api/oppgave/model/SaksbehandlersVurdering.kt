@@ -4,7 +4,6 @@ data class SaksbehandlersVurdering(
     val status: Status,
 )
 
-
 enum class Status {
     GODKJENT,
     UGYLDIG_TILBAKEDATERING,
