@@ -16,7 +16,7 @@ spring:
     bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
     security:
       protocol: plaintext
-
+#if it aint broke...
 nais:
   token_endpoint: ${NAIS_TOKEN_ENDPOINT:http://localhost:8080/token}
   cluster: ${NAIS_CLUSTER_NAME:local}
