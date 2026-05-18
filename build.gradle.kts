@@ -10,7 +10,7 @@ val javaVersion = JvmTarget.JVM_21
 
 val ktfmtVersion = "0.44"
 val sykmeldingInputVersion = "16"
-val caffeineVersion = "3.2.3"
+val caffeineVersion = "3.2.4"
 
 plugins {
 	kotlin("jvm") version "2.3.10"
@@ -54,9 +54,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.kafka:spring-kafka-test")
-    testImplementation("org.testcontainers:testcontainers-kafka:2.0.3")
-    testImplementation("org.testcontainers:testcontainers-postgresql:2.0.3")
-    testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.3")
+    testImplementation("org.testcontainers:testcontainers-kafka:2.0.5")
+    testImplementation("org.testcontainers:testcontainers-postgresql:2.0.5")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     runtimeOnly("org.postgresql:postgresql")
